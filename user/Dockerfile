@@ -12,13 +12,13 @@ WORKDIR $GOPATH/src/github.com/iamvasanth07/showcase
 
 COPY go.mod .
 COPY go.sum .
-
-RUN go mod download
+ENV GO111MODULE=on
+RUN go mod tidy
 
 COPY . .
 
 # Build the binary.
-RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/app .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/app .
 
 # Final stage: the running container.
 FROM scratch
