@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/iamvasanth07/showcase/user/model"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type UserRepo struct {
@@ -61,9 +61,9 @@ func (r *UserRepo) Delete(id string) error {
 	return r.db.Delete(user).Error
 }
 
-func (r *UserRepo) FindAll(page int32, limt int32) ([]*model.User, error) {
+func (r *UserRepo) FindAll(page int32, limit int32) ([]*model.User, error) {
 	var users []*model.User
-	err := r.db.Offset(page).Limit(limt).Find(&users).Error
+	err := r.db.Offset(int(page)).Limit(int(limit)).Find(&users).Error
 	if err != nil {
 		return nil, err
 	}

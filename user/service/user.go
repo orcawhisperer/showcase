@@ -3,10 +3,10 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"os"
-	"strings"
 
 	"github.com/iamvasanth07/showcase/user/model"
 	pb "github.com/iamvasanth07/showcase/user/proto"
@@ -150,19 +150,8 @@ func (s *UserServer) GetAll(ctx context.Context, req *pb.GetAllUserRequest) (*pb
 }
 
 func RunServer() {
-	DB_CONNECTION_STR := strings.Join([]string{
-		os.Getenv("DB_USER"),
-		":",
-		os.Getenv("DB_PASSWORD"),
-		"@tcp(",
-		os.Getenv("DB_HOST"),
-		":",
-		os.Getenv("DB_PORT"),
-		")/",
-		os.Getenv("DB_NAME"),
-		"?charset=utf8&parseTime=True&loc=Local",
-	}, "")
-	conn, err := utils.GetDBConnection(DB_CONNECTION_STR)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
+	conn, err := utils.GetDBConnection(dsn)
 	if err != nil {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
@@ -170,7 +159,6 @@ func RunServer() {
 	if err != nil {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
-	defer conn.Close()
 	lis, err := net.Listen("tcp", os.Getenv("USER_GRPC_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

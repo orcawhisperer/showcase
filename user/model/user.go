@@ -5,9 +5,9 @@ package model
 import (
 	"regexp"
 
-	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 var (
@@ -30,10 +30,11 @@ type User struct {
 	Password string
 }
 
-//Hook before create to generate uuid
-
-func (u *User) BeforeCreate(scope *gorm.Scope) error {
-	return scope.SetColumn("Id", uuid.NewV4().String())
+// Hook before create to generate uuid
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+	uuid := uuid.NewV4()
+	u.Id = uuid.String()
+	return nil
 }
 
 // Hook before save to hash password using bcrypt

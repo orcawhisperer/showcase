@@ -13,7 +13,7 @@ COPY . .
 
 # Fetch dependencies.
 # Using go get.
-RUN GO111MODULE=on go get -d -v
+RUN go mod download
 
 # Build the binary.
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/app .
@@ -31,7 +31,7 @@ USER appuser
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
-# Run the hello binary.
+# Run the app.
 ENTRYPOINT ["/go/bin/app"]
 
 

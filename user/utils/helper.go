@@ -1,12 +1,13 @@
 package utils
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-func GetDBConnection(conn_str string) (*gorm.DB, error) {
+func GetDBConnection(dsn string) (*gorm.DB, error) {
 	//return gorm connection using connectoin string
-	conn, err := gorm.Open("postgres", conn_str)
+	conn, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
