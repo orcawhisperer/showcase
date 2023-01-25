@@ -3,16 +3,37 @@
 package model
 
 import (
+	"regexp"
+
 	"github.com/jinzhu/gorm"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	EmailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+
+	PhoneRegex = regexp.MustCompile(`^[0-9]{10}$`)
+
+	PasswordRegex = regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*]{8,30}$`)
+
+	NameRegex = regexp.MustCompile(`^[a-zA-Z ]+$`)
+
+	IDRegex = regexp.MustCompile(`^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$`)
+)
+
 type User struct {
-	gorm.Model
+	Id       string `gorm:"primary_key"`
 	Name     string
 	Email    string `gorm:"unique_index"`
 	Phone    string `gorm:"unique_index"`
 	Password string
+}
+
+//Hook before create to generate uuid
+
+func (u *User) BeforeCreate(scope *gorm.Scope) error {
+	return scope.SetColumn("Id", uuid.NewV4().String())
 }
 
 // Hook before save to hash password using bcrypt

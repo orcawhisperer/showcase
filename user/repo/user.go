@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/iamvasanth07/showcase/user/model"
 	"github.com/jinzhu/gorm"
-	"github.com/your/repo/user/model"
 )
 
 type UserRepo struct {
@@ -42,7 +42,7 @@ func (r *UserRepo) FindByPhone(phone string) (*model.User, error) {
 	return user, nil
 }
 
-func (r *UserRepo) FindByID(id uint) (*model.User, error) {
+func (r *UserRepo) FindByID(id string) (*model.User, error) {
 	user := &model.User{}
 	err := r.db.Where("id = ?", id).First(user).Error
 	if err != nil {
@@ -55,15 +55,15 @@ func (r *UserRepo) Update(user *model.User) error {
 	return r.db.Save(user).Error
 }
 
-func (r *UserRepo) Delete(id uint) error {
+func (r *UserRepo) Delete(id string) error {
 	user := &model.User{}
-	user.ID = id
+	user.Id = id
 	return r.db.Delete(user).Error
 }
 
-func (r *UserRepo) FindAll() ([]*model.User, error) {
-	users := []*model.User{}
-	err := r.db.Find(&users).Error
+func (r *UserRepo) FindAll(page int32, limt int32) ([]*model.User, error) {
+	var users []*model.User
+	err := r.db.Offset(page).Limit(limt).Find(&users).Error
 	if err != nil {
 		return nil, err
 	}

@@ -5,17 +5,15 @@ syntax = "proto3";
 
 package user;
 
-option go_package = "github.com/username/projectname/user";
+option go_package = "github.com/iamvasanth07/showcase/user/proto";
 
 // User service definition.
-service User {
-  rpc GetUser (GetUserRequest) returns (GetUserResponse) {}
-  rpc GetAllUser (google.protobuf.Empty) returns (stream User) {}
-  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
-  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {}
-  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {}
-  rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {}
-  rpc LogoutUser (LogoutUserRequest) returns (LogoutUserResponse) {}
+service UserService {
+  rpc Get (GetUserRequest) returns (GetUserResponse) {}
+  rpc GetAll (GetAllUserRequest) returns (GetAllUserResponse) {}
+  rpc Create (CreateUserRequest) returns (CreateUserResponse) {}
+  rpc Update (UpdateUserRequest) returns (UpdateUserResponse) {}
+  rpc Delete (DeleteUserRequest) returns (DeleteUserResponse) {}
 }
 
 // The request message containing the user's id.
@@ -26,6 +24,17 @@ message GetUserRequest {
 // The response message containing the user.
 message GetUserResponse {
     User user = 1;
+}
+
+// Get All User Request
+message GetAllUserRequest {
+    Pagination pagination = 1;
+}
+
+// The response message containing the list of user.
+message GetAllUserResponse {
+    repeated User users = 1;
+    Metadata metadata = 2;
 }
 
 // The request message containing the user.
@@ -58,17 +67,6 @@ message DeleteUserResponse {
   string id = 1;
 }
 
-// The request message containing the user's email and password.
-message LoginUserRequest {
-  string email = 1;
-  string password = 2;
-}
-
-// The response message containing the user.
-message LoginUserResponse {
-  User user = 1;
-}
-
 // User message.
 message User {
   string id = 1;
@@ -76,6 +74,19 @@ message User {
   string email = 3;
   string password = 4;
   string phone = 5;
+}
+
+//pagination
+message Pagination {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+// Metadata message.
+message Metadata {
+  int32 page = 1;
+  int32 limit = 2;
+  int32 total = 3;
 }
 
 
