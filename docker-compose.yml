@@ -1,0 +1,39 @@
+# Docker compose for setting up a local development environment
+version: '3.7'
+
+services:
+  database:
+    image: postgres:12.2
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+    networks:
+      - backend-network
+  user-service:
+    image: user-service
+    build:
+      context: user/
+      dockerfile: Dockerfile
+    ports:
+      - 8080:50051
+    depends_on:
+      - database
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_SCHEMA=postgres
+      - DB_SSLMODE=disable
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge
+      

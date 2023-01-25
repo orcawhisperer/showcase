@@ -3,11 +3,9 @@ module github.com/iamvasanth07/showcase/user
 go 1.19
 
 require (
-	github.com/jinzhu/gorm v1.9.16
-	github.com/lib/pq v1.10.7
 	github.com/satori/go.uuid v1.2.0
 	golang.org/x/crypto v0.5.0
-	google.golang.org/grpc v1.52.1
+	google.golang.org/grpc v1.52.3
 	google.golang.org/protobuf v1.28.1
 	gorm.io/driver/postgres v1.4.6
 	gorm.io/gorm v1.24.3

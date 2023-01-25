@@ -8,15 +8,17 @@ RUN apk update && apk add --no-cache git
 # Create appuser.
 RUN adduser -D -g '' appuser
 
-WORKDIR $GOPATH/src/github.com/iamvasanth07/showcase/user
-COPY . .
+WORKDIR $GOPATH/src/github.com/iamvasanth07/showcase
 
-# Fetch dependencies.
-# Using go get.
+COPY go.mod .
+COPY go.sum .
+
 RUN go mod download
 
+COPY . .
+
 # Build the binary.
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/app .
+RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/app .
 
 # Final stage: the running container.
 FROM scratch
