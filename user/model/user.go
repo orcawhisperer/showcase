@@ -30,16 +30,10 @@ type User struct {
 	Password string
 }
 
-// Hook before create to generate uuid
+// Hook before create to generate uuid and hash password
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	uuid := uuid.NewV4()
 	u.Id = uuid.String()
-	return nil
-}
-
-// Hook before save to hash password using bcrypt
-
-func (u *User) BeforeSave() error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err

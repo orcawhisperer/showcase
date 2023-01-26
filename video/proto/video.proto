@@ -1,0 +1,102 @@
+// Proto for video service
+
+syntax = "proto3";
+
+package video;
+
+option go_package = "github.com/iamvasanth07/showcase/video";
+
+// VideoService is the service for video management
+
+service VideoService {
+    rpc CreateVideo (CreateVideoRequest) returns (CreateVideoResponse) {}
+    rpc GetVideo (GetVideoRequest) returns (GetVideoResponse) {}
+    rpc ListVideos (ListVideosRequest) returns (ListVideosResponse) {}
+    rpc DeleteVideo (DeleteVideoRequest) returns (DeleteVideoResponse) {}
+    rpc UpdateVideo (UpdateVideoRequest) returns (UpdateVideoResponse) {}
+}
+
+// CreateVideoRequest is the request for the CreateVideo method
+message CreateVideoRequest {
+    // The video to create
+    Video video = 1;
+}
+
+// CreateVideoResponse is the response for the CreateVideo method
+message CreateVideoResponse {
+    // The created video
+    Video video = 1;
+}
+
+// GetVideoRequest is the request for the GetVideo method
+message GetVideoRequest {
+    // The id of the video to retrieve
+    string id = 1;
+}
+
+// GetVideoResponse is the response for the GetVideo method
+message GetVideoResponse {
+    // The retrieved video
+    Video video = 1;
+}
+
+// ListVideosRequest is the request for the ListVideos method
+message ListVideosRequest {
+    // The maximum number of videos to return
+    int32 page_size = 1;
+    // The page token for the next page of videos
+    string page_token = 2;
+}
+
+// ListVideosResponse is the response for the ListVideos method
+message ListVideosResponse {
+    // The list of videos
+    repeated Video videos = 1;
+    // The page token for the next page of videos
+    string next_page_token = 2;
+}
+
+// DeleteVideoRequest is the request for the DeleteVideo method
+message DeleteVideoRequest {
+    // The id of the video to delete
+    string id = 1;
+}
+
+// DeleteVideoResponse is the response for the DeleteVideo method
+message DeleteVideoResponse {
+    // The deleted video
+    Video video = 1;
+}
+
+// UpdateVideoRequest is the request for the UpdateVideo method
+message UpdateVideoRequest {
+    // The video to update
+    Video video = 1;
+}
+
+// UpdateVideoResponse is the response for the UpdateVideo method
+message UpdateVideoResponse {
+    // The updated video
+    Video video = 1;
+}
+
+// Video message
+message Video {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    string url = 4;
+    string channelId = 5;
+    uint64 views = 6;
+    int32 duration = 7;
+    string thumbnail = 8;
+    string publishedAt = 9;
+    string category = 10;
+    string language = 11;
+    string country = 12;
+    repeated string tags = 13;
+    string slug = 14;
+}
+
+
+    

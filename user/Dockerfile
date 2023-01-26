@@ -1,5 +1,5 @@
-# Build user micro service 
-FROM golang:1.12.5-alpine3.9 as builder
+# Build user micro service image
+FROM golang:alpine3.17 AS builder
 
 # Install git.
 # Git is required for fetching the dependencies.
@@ -12,29 +12,26 @@ WORKDIR $GOPATH/src/github.com/iamvasanth07/showcase
 
 COPY go.mod .
 COPY go.sum .
-ENV GO111MODULE=on
-RUN go mod tidy
+
+RUN go mod download
 
 COPY . .
 
 # Build the binary.
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/app .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/user .
 
 # Final stage: the running container.
 FROM scratch
 # Import the user and group files from the builder.
 COPY --from=builder /etc/passwd /etc/passwd
 # Copy our static executable.
-COPY --from=builder /go/bin/app /go/bin/app
+COPY --from=builder /go/bin/user /go/bin/user
 
 # Use an unprivileged user.
 USER appuser
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
-
 # Run the app.
-ENTRYPOINT ["/go/bin/app"]
+CMD ["/go/bin/./user"]
 
 
 
