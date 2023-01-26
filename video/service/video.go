@@ -10,17 +10,18 @@ import (
 	"os"
 
 	"github.com/iamvasanth07/showcase/common"
+	"github.com/iamvasanth07/showcase/video/model"
 	pb "github.com/iamvasanth07/showcase/video/proto"
 	"github.com/iamvasanth07/showcase/video/repo"
 	"google.golang.org/grpc"
 )
 
 type IVideoService interface {
-	CreateVideo(ctx context.Context, video *pb.Video) (*pb.Video, error)
-	GetVideo(ctx context.Context, videoId *pb.VideoId) (*pb.Video, error)
-	ListVideos(ctx context.Context, limit *pb.Limit) (*pb.Videos, error)
-	UpdateVideo(ctx context.Context, video *pb.Video) (*pb.Video, error)
-	DeleteVideo(ctx context.Context, videoId *pb.VideoId) (*pb.Video, error)
+	CreateVideo(ctx context.Context, req *pb.CreateVideoRequest) (*pb.CreateVideoResponse, error)
+	GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*pb.GetVideoResponse, error)
+	ListVideos(ctx context.Context, req *pb.ListVideosRequest) (*pb.ListVideosResponse, error)
+	UpdateVideo(ctx context.Context, req *pb.UpdateVideoRequest) (*pb.UpdateVideoResponse, error)
+	DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (*pb.DeleteVideoResponse, error)
 }
 
 type VideoService struct {
@@ -32,53 +33,99 @@ func NewVideoService(db *repo.VideoRepo, logger *log.Logger) *VideoService {
 	return &VideoService{db, logger}
 }
 
-func (v *VideoService) CreateVideo(ctx context.Context, video *pb.Video) (*pb.Video, error) {
-	v.logger.Println("Creating video")
-	err := v.db.CreateVideo(video)
+func (s *VideoService) CreateVideo(ctx context.Context, req *pb.CreateVideoRequest) (*pb.CreateVideoResponse, error) {
+	s.logger.Println("Create video request received")
+	video := model.Video{
+		Title:       req.Video.Title,
+		Description: req.Video.Description,
+		Url:         req.Video.Url,
+	}
+	err := s.db.CreateVideo(&video)
 	if err != nil {
 		return nil, err
 	}
-	return video, nil
+	res := &pb.CreateVideoResponse{
+		Video: &pb.Video{
+			Id:          video.ID,
+			Title:       video.Title,
+			Description: video.Description,
+			Url:         video.Url,
+		},
+	}
+	return res, nil
 }
 
-func (v *VideoService) GetVideo(ctx context.Context, videoId *pb.VideoId) (*pb.Video, error) {
-	v.logger.Println("Getting video")
-	video, err := v.db.GetVideo(videoId.Id)
+func (s *VideoService) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*pb.GetVideoResponse, error) {
+	s.logger.Println("Get video request received")
+	video, err := s.db.GetVideo(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	return video, nil
+	res := &pb.GetVideoResponse{
+		Video: &pb.Video{
+			Id:          video.ID,
+			Title:       video.Title,
+			Description: video.Description,
+			Url:         video.Url,
+		},
+	}
+	return res, nil
 }
 
-func (v *VideoService) ListVideos(ctx context.Context, limit *pb.Limit) (*pb.Videos, error) {
-	v.logger.Println("Listing videos")
-	videos, err := v.db.ListVideos(int(limit.Limit), int(limit.Offset))
+func (s *VideoService) ListVideos(ctx context.Context, req *pb.ListVideosRequest) (*pb.ListVideosResponse, error) {
+	s.logger.Println("List videos request received")
+	videos, err := s.db.ListVideos()
 	if err != nil {
 		return nil, err
 	}
-	return &pb.Videos{Videos: videos}, nil
+	var pbVideos []*pb.Video
+	for _, video := range videos {
+		pbVideos = append(pbVideos, &pb.Video{
+			Id:          video.ID,
+			Title:       video.Title,
+			Description: video.Description,
+			Url:         video.Url,
+		})
+	}
+	res := &pb.ListVideosResponse{
+		Videos: pbVideos,
+	}
+	return res, nil
 }
 
-func (v *VideoService) UpdateVideo(ctx context.Context, video *pb.Video) (*pb.Video, error) {
-	v.logger.Println("Updating video")
-	err := v.db.UpdateVideo(video)
+func (s *VideoService) UpdateVideo(ctx context.Context, req *pb.UpdateVideoRequest) (*pb.UpdateVideoResponse, error) {
+	s.logger.Println("Update video request received")
+	video := model.Video{
+		ID:          req.Video.Id,
+		Title:       req.Video.Title,
+		Description: req.Video.Description,
+		Url:         req.Video.Url,
+	}
+	err := s.db.UpdateVideo(&video)
 	if err != nil {
 		return nil, err
 	}
-	return video, nil
+	res := &pb.UpdateVideoResponse{
+		Video: &pb.Video{
+			Id:          video.ID,
+			Title:       video.Title,
+			Description: video.Description,
+			Url:         video.Url,
+		},
+	}
+	return res, nil
 }
 
-func (v *VideoService) DeleteVideo(ctx context.Context, videoId *pb.VideoId) (*pb.Video, error) {
-	v.logger.Println("Deleting video")
-	video, err := v.db.GetVideo(videoId.Id)
+func (s *VideoService) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (*pb.DeleteVideoResponse, error) {
+	s.logger.Println("Delete video request received")
+	err := s.db.DeleteVideo(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	err = v.db.DeleteVideo(videoId.Id)
-	if err != nil {
-		return nil, err
+	res := &pb.DeleteVideoResponse{
+		Success: true,
 	}
-	return video, nil
+	return res, nil
 }
 
 func RunServer() {
@@ -96,7 +143,7 @@ func RunServer() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	srv := grpc.NewServer()
-	pb.RegisterVideoServiceServer(srv, s)
+	pb.RegisterVideoServiceServer(srv, IVideoService)
 	if err := srv.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

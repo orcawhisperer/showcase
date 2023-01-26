@@ -42,18 +42,13 @@ message GetVideoResponse {
 
 // ListVideosRequest is the request for the ListVideos method
 message ListVideosRequest {
-    // The maximum number of videos to return
-    int32 page_size = 1;
-    // The page token for the next page of videos
-    string page_token = 2;
+    int32 page = 1;
+    string limit = 2;
 }
 
 // ListVideosResponse is the response for the ListVideos method
 message ListVideosResponse {
-    // The list of videos
-    repeated Video videos = 1;
-    // The page token for the next page of videos
-    string next_page_token = 2;
+    repeated Video videos = 1;    
 }
 
 // DeleteVideoRequest is the request for the DeleteVideo method

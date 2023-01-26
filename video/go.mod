@@ -3,7 +3,7 @@ module github.com/iamvasanth07/showcase/video
 go 1.19
 
 require (
-	github.com/iamvasanth07/showcase v0.0.0-20230126142559-eccce0c83c40
+	github.com/iamvasanth07/showcase/common v0.0.0-20230126151048-32429370d243
 	github.com/satori/go.uuid v1.2.0
 	google.golang.org/grpc v1.52.3
 	google.golang.org/protobuf v1.28.1

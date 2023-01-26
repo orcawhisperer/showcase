@@ -160,12 +160,15 @@ func RunServer() {
 	if err != nil {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
-	lis, err := net.Listen("tcp", ":"+os.Getenv("USER_SERVICE_PORT"))
+	userServer := NewUserServer(db)
+	userServer.log.Println("Server Created....")
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", os.Getenv("USER_SERVICE_PORT")))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
-	pb.RegisterUserServiceServer(s, NewUserServer(db))
+	opts := []grpc.ServerOption{}
+	s := grpc.NewServer(opts...)
+	pb.RegisterUserServiceServer(s, userServer)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
