@@ -10,10 +10,9 @@ import (
 	"os"
 
 	"github.com/iamvasanth07/showcase/common"
+	pb "github.com/iamvasanth07/showcase/video/proto"
 	"github.com/iamvasanth07/showcase/video/repo"
 	"google.golang.org/grpc"
-
-	pb "github.com/iamvasanth07/showcase/user/proto"
 )
 
 type IVideoService interface {

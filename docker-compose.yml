@@ -32,7 +32,24 @@ services:
       - DB_SSLMODE=disable
     networks:
       - backend-network
-
+  video-service:
+    image: video-service
+    build:
+      context: video/
+      dockerfile: Dockerfile
+    ports:
+      - 50052:50052
+    depends_on:
+      - database
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_SCHEMA=postgres
+      - DB_SSLMODE=disable
+    networks:
+      - backend-network
 networks:
   backend-network:
     driver: bridge
