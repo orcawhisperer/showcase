@@ -30,6 +30,10 @@ services:
       - DB_PASSWORD=postgres
       - DB_SCHEMA=postgres
       - DB_SSLMODE=disable
+      - JWT_SECRET=secret
+      - JWT_EXPIRATION=1h
+      - USER_SERVICE_HOST=user-service
+      - USER_SERVICE_PORT=50051
     networks:
       - backend-network
   video-service:
@@ -48,6 +52,8 @@ services:
       - DB_PASSWORD=postgres
       - DB_SCHEMA=postgres
       - DB_SSLMODE=disable
+      - VIDEO_SERVICE_HOST=video-service
+      - VIDEO_SERVICE_PORT=50052
     networks:
       - backend-network
 networks:

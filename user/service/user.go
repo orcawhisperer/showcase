@@ -160,7 +160,7 @@ func RunServer() {
 	if err != nil {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
-	lis, err := net.Listen("tcp", ":"+os.Getenv("USER_SVC_PORT"))
+	lis, err := net.Listen("tcp", ":"+os.Getenv("USER_SERVICE_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -170,5 +170,5 @@ func RunServer() {
 		log.Fatalf("failed to serve: %v", err)
 	}
 
-	log.Println("server started on port: " + os.Getenv("USER_SVC_PORT"))
+	log.Println("server started on port: " + os.Getenv("USER_SERVICE_PORT"))
 }

@@ -88,11 +88,10 @@ func RunServer() {
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
-	defer conn.Close()
 	repo := repo.NewVideoRepo(conn)
 	logger := log.New(os.Stdout, "video ", log.LstdFlags)
 	s := NewVideoService(repo, logger)
-	lis, err := net.Listen("tcp", ":"+os.Getenv("VIDEO_PORT"))
+	lis, err := net.Listen("tcp", ":"+os.Getenv("VIDEO_SERVICE_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -101,4 +100,5 @@ func RunServer() {
 	if err := srv.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+	fmt.Println("Video service started on port " + os.Getenv("VIDEO_SERVICE_PORT"))
 }
