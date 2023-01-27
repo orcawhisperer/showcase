@@ -8,10 +8,12 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 
 	"github.com/iamvasanth07/showcase/common"
+	pb "github.com/iamvasanth07/showcase/common/protos"
+	"github.com/iamvasanth07/showcase/video/config"
 	"github.com/iamvasanth07/showcase/video/model"
-	pb "github.com/iamvasanth07/showcase/video/proto"
 	"github.com/iamvasanth07/showcase/video/repo"
 	"google.golang.org/grpc"
 )
@@ -25,16 +27,22 @@ type IVideoService interface {
 }
 
 type VideoService struct {
-	db     *repo.VideoRepo
-	logger *log.Logger
+	db       *repo.VideoRepo
+	log      *log.Logger
+	settings *config.Settings
+	pb.UnimplementedVideoServiceServer
 }
 
-func NewVideoService(db *repo.VideoRepo, logger *log.Logger) *VideoService {
-	return &VideoService{db, logger}
+func NewVideoService(db *repo.VideoRepo, logger *log.Logger, settings *config.Settings) *VideoService {
+	return &VideoService{
+		db:       db,
+		log:      logger,
+		settings: settings,
+	}
 }
 
 func (s *VideoService) CreateVideo(ctx context.Context, req *pb.CreateVideoRequest) (*pb.CreateVideoResponse, error) {
-	s.logger.Println("Create video request received")
+	s.log.Println("Create video request received")
 	video := model.Video{
 		Title:       req.Video.Title,
 		Description: req.Video.Description,
@@ -56,7 +64,7 @@ func (s *VideoService) CreateVideo(ctx context.Context, req *pb.CreateVideoReque
 }
 
 func (s *VideoService) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*pb.GetVideoResponse, error) {
-	s.logger.Println("Get video request received")
+	s.log.Println("Get video request received")
 	video, err := s.db.GetVideo(req.Id)
 	if err != nil {
 		return nil, err
@@ -73,15 +81,15 @@ func (s *VideoService) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*
 }
 
 func (s *VideoService) ListVideos(ctx context.Context, req *pb.ListVideosRequest) (*pb.ListVideosResponse, error) {
-	s.logger.Println("List videos request received")
-	videos, err := s.db.ListVideos()
+	s.log.Println("List videos request received")
+	videos, err := s.db.ListVideos(int(req.Page), int(req.Limit))
 	if err != nil {
 		return nil, err
 	}
 	var pbVideos []*pb.Video
 	for _, video := range videos {
 		pbVideos = append(pbVideos, &pb.Video{
-			Id:          video.ID,
+			Id:          video.Id,
 			Title:       video.Title,
 			Description: video.Description,
 			Url:         video.Url,
@@ -94,7 +102,7 @@ func (s *VideoService) ListVideos(ctx context.Context, req *pb.ListVideosRequest
 }
 
 func (s *VideoService) UpdateVideo(ctx context.Context, req *pb.UpdateVideoRequest) (*pb.UpdateVideoResponse, error) {
-	s.logger.Println("Update video request received")
+	s.log.Println("Update video request received")
 	video := model.Video{
 		Id:          req.Video.Id,
 		Title:       req.Video.Title,
@@ -117,7 +125,7 @@ func (s *VideoService) UpdateVideo(ctx context.Context, req *pb.UpdateVideoReque
 }
 
 func (s *VideoService) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (*pb.DeleteVideoResponse, error) {
-	s.logger.Println("Delete video request received")
+	s.log.Println("Delete video request received")
 	err := s.db.DeleteVideo(req.Id)
 	if err != nil {
 		return nil, err
@@ -125,29 +133,42 @@ func (s *VideoService) DeleteVideo(ctx context.Context, req *pb.DeleteVideoReque
 	res := &pb.DeleteVideoResponse{
 		Video: &pb.Video{
 			Id: req.Id,
-		}
+		},
 	}
 	return res, nil
 }
 
 func RunServer() {
-
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
+	logger := log.New(os.Stdout, "video-service ", log.LstdFlags)
+	settings := config.GetSettings()
+	logger.Println("Initializing user service with settings...")
+	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
 	conn, err := common.GetDBConnection(dsn)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
-	repo := repo.NewVideoRepo(conn)
-	logger := log.New(os.Stdout, "video ", log.LstdFlags)
-	s := NewVideoService(repo, logger)
-	lis, err := net.Listen("tcp", ":"+os.Getenv("VIDEO_SERVICE_PORT"))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	srv := grpc.NewServer()
-	pb.RegisterVideoServiceServer(srv, IVideoService)
-	if err := srv.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
-	fmt.Println("Video service started on port " + os.Getenv("VIDEO_SERVICE_PORT"))
+	go func() {
+		repo := repo.NewVideoRepo(conn)
+		s := NewVideoService(repo, logger, settings)
+		s.log.Println("Video service started on port " + settings.Server.Port)
+		lis, err := net.Listen("tcp", "localhost:"+settings.Server.Port)
+		if err != nil {
+			log.Fatalf("failed to listen: %v", err)
+		}
+		srv := grpc.NewServer()
+		pb.RegisterVideoServiceServer(srv, s)
+		if err := srv.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	// Block until a signal is received.
+	<-c
+	logger.Println("Shutting down video service...")
+	os.Exit(0)
+
 }

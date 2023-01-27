@@ -2,8 +2,8 @@
 version: '3.7'
 
 services:
-  database:
-    image: postgres:12.2
+  database-service:
+    image: postgres:latest
     ports:
       - 5432:5432
     environment:
@@ -22,18 +22,19 @@ services:
     ports:
       - 50051:50051
     depends_on:
-      - database
+      - database-service
     environment:
-      - DB_HOST=postgres
+      - DB_HOST=database-service
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - DB_SCHEMA=postgres
+      - DB_NAME=postgres
       - DB_SSLMODE=disable
       - JWT_SECRET=secret
       - JWT_EXPIRATION=1h
-      - USER_SERVICE_HOST=user-service
-      - USER_SERVICE_PORT=50051
+      - SERVER_HOST=user-service
+      - SERVER_PORT=50051
+      - LOG_LEVEL=debug
     networks:
       - backend-network
   video-service:
@@ -44,16 +45,17 @@ services:
     ports:
       - 50052:50052
     depends_on:
-      - database
+      - database-service
     environment:
-      - DB_HOST=postgres
+      - DB_HOST=database-service
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-      - DB_SCHEMA=postgres
+      - DB_NAME=postgres
       - DB_SSLMODE=disable
-      - VIDEO_SERVICE_HOST=video-service
-      - VIDEO_SERVICE_PORT=50052
+      - SERVER_HOST=video-service
+      - SERVER_PORT=50052
+      - LOG_LEVEL=debug
     networks:
       - backend-network
 networks:

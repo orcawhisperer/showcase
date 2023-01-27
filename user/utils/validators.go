@@ -3,8 +3,8 @@ package utils
 import (
 	"fmt"
 
+	pb "github.com/iamvasanth07/showcase/common/protos"
 	"github.com/iamvasanth07/showcase/user/model"
-	pb "github.com/iamvasanth07/showcase/user/proto"
 )
 
 // ValidateEmail validates email

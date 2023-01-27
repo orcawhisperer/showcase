@@ -7,10 +7,12 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 
 	"github.com/iamvasanth07/showcase/common"
+	pb "github.com/iamvasanth07/showcase/common/protos"
+	"github.com/iamvasanth07/showcase/user/config"
 	"github.com/iamvasanth07/showcase/user/model"
-	pb "github.com/iamvasanth07/showcase/user/proto"
 	"github.com/iamvasanth07/showcase/user/repo"
 	"github.com/iamvasanth07/showcase/user/utils"
 	"google.golang.org/grpc"
@@ -25,15 +27,17 @@ type IUserService interface {
 }
 
 type UserServer struct {
-	log *log.Logger
-	db  *repo.UserRepo
+	db       *repo.UserRepo
+	log      *log.Logger
+	settings *config.Settings
 	pb.UnimplementedUserServiceServer
 }
 
-func NewUserServer(db *repo.UserRepo) *UserServer {
+func NewUserServer(db *repo.UserRepo, log *log.Logger, settings *config.Settings) *UserServer {
 	return &UserServer{
-		log: log.New(os.Stdout, "user-service: ", log.LstdFlags),
-		db:  db,
+		db:       db,
+		log:      log,
+		settings: settings,
 	}
 }
 
@@ -151,25 +155,39 @@ func (s *UserServer) GetAll(ctx context.Context, req *pb.GetAllUserRequest) (*pb
 }
 
 func RunServer() {
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
+
+	logger := log.New(os.Stdout, "user-service: ", log.LstdFlags)
+	settings := config.GetSettings()
+	logger.Println("Initializing user service with settings...")
+	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
 	conn, err := common.GetDBConnection(dsn)
 	if err != nil {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
-	db := repo.NewUserRepo(conn)
-	if err != nil {
-		log.Fatalf("failed to connect to db: %v", err)
-	}
-	userServer := NewUserServer(db)
-	userServer.log.Println("Server Created on port: " + os.Getenv("USER_SERVICE_PORT"))
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", os.Getenv("USER_SERVICE_PORT")))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	opts := []grpc.ServerOption{}
-	s := grpc.NewServer(opts...)
-	pb.RegisterUserServiceServer(s, userServer)
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+
+	go func() {
+		db := repo.NewUserRepo(conn)
+		userServer := NewUserServer(db, logger, settings)
+		userServer.log.Println("Server started on port: " + settings.Server.Port)
+		lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", settings.Server.Port))
+		if err != nil {
+			log.Fatalf("failed to listen: %v", err)
+		}
+		opts := []grpc.ServerOption{}
+		s := grpc.NewServer(opts...)
+		pb.RegisterUserServiceServer(s, userServer)
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+
+	logger.Println("Stopping the server")
+
+	os.Exit(0)
+
 }

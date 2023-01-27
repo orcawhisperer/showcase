@@ -31,7 +31,7 @@ COPY --from=builder /go/bin/video /go/bin/video
 USER appuser
 
 # Run the app.
-CMD ["/go/bin/./video"]
+ENTRYPOINT ["/go/bin/video"]
 
 
 

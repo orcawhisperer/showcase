@@ -3,9 +3,9 @@
 syntax = "proto3";
 
 
-package user;
+package protos;
 
-option go_package = "github.com/iamvasanth07/showcase/user/proto";
+option go_package = "github.com/iamvasanth07/showcase/common/protos";
 
 import "google/api/annotations.proto";
 
@@ -14,13 +14,11 @@ service UserService {
   rpc Get (GetUserRequest) returns (GetUserResponse) {
     option (google.api.http) = {
       get: "/v1/user/{id}"
-      body: "*"
     };
   }
   rpc GetAll (GetAllUserRequest) returns (GetAllUserResponse) {
     option (google.api.http) = {
       get: "/v1/user"
-      body: "*"
     };
   }
   rpc Create (CreateUserRequest) returns (CreateUserResponse) {
@@ -38,7 +36,6 @@ service UserService {
   rpc Delete (DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
       delete: "/v1/user/{id}"
-      body: "*"
     };
   }
 }
@@ -77,6 +74,7 @@ message CreateUserResponse {
 // The request message containing the user.
 message UpdateUserRequest {
     User user = 1;
+    string id = 2;
 }
 
 // The response message containing the user.

@@ -2,9 +2,9 @@
 
 syntax = "proto3";
 
-package video;
+package protos;
 
-option go_package = "github.com/iamvasanth07/showcase/video";
+option go_package = "github.com/iamvasanth07/showcase/common/protos";
 
 // VideoService is the service for video management
 
@@ -43,7 +43,7 @@ message GetVideoResponse {
 // ListVideosRequest is the request for the ListVideos method
 message ListVideosRequest {
     int32 page = 1;
-    string limit = 2;
+    int32 limit = 2;
 }
 
 // ListVideosResponse is the response for the ListVideos method

@@ -33,10 +33,7 @@ type Video struct {
 
 // Hook before create to generate uuid and slug
 func (u *Video) BeforeCreate(tx *gorm.DB) error {
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		return err
-	}
+	uuid := uuid.NewV4()
 	u.Id = uuid.String()
 	u.Slug = slug.Make(u.Title)
 	u.Url = "https://www.showcase.com/watch?v=" + u.Slug
