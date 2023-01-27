@@ -7,13 +7,40 @@ package user;
 
 option go_package = "github.com/iamvasanth07/showcase/user/proto";
 
+import "google/api/annotations.proto";
+
 // User service definition.
 service UserService {
-  rpc Get (GetUserRequest) returns (GetUserResponse) {}
-  rpc GetAll (GetAllUserRequest) returns (GetAllUserResponse) {}
-  rpc Create (CreateUserRequest) returns (CreateUserResponse) {}
-  rpc Update (UpdateUserRequest) returns (UpdateUserResponse) {}
-  rpc Delete (DeleteUserRequest) returns (DeleteUserResponse) {}
+  rpc Get (GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/user/{id}"
+      body: "*"
+    };
+  }
+  rpc GetAll (GetAllUserRequest) returns (GetAllUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/user"
+      body: "*"
+    };
+  }
+  rpc Create (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/user"
+      body: "*"
+    };
+  }
+  rpc Update (UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      put: "/v1/user/{id}"
+      body: "*"
+    };
+  }
+  rpc Delete (DeleteUserRequest) returns (DeleteUserResponse) {
+    option (google.api.http) = {
+      delete: "/v1/user/{id}"
+      body: "*"
+    };
+  }
 }
 
 // The request message containing the user's id.

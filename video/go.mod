@@ -3,6 +3,7 @@ module github.com/iamvasanth07/showcase/video
 go 1.19
 
 require (
+	github.com/gosimple/slug v1.13.1
 	github.com/iamvasanth07/showcase/common v0.0.0-20230126151048-32429370d243
 	github.com/satori/go.uuid v1.2.0
 	google.golang.org/grpc v1.52.3
@@ -12,6 +13,7 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.2.0 // indirect

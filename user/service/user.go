@@ -161,7 +161,7 @@ func RunServer() {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
 	userServer := NewUserServer(db)
-	userServer.log.Println("Server Created....")
+	userServer.log.Println("Server Created on port: " + os.Getenv("USER_SERVICE_PORT"))
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", os.Getenv("USER_SERVICE_PORT")))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -172,6 +172,4 @@ func RunServer() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-
-	log.Println("server started on port: " + os.Getenv("USER_SERVICE_PORT"))
 }

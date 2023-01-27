@@ -38,7 +38,7 @@ func (s *VideoService) CreateVideo(ctx context.Context, req *pb.CreateVideoReque
 	video := model.Video{
 		Title:       req.Video.Title,
 		Description: req.Video.Description,
-		Url:         req.Video.Url,
+		Category:    req.Video.Category,
 	}
 	err := s.db.CreateVideo(&video)
 	if err != nil {
@@ -46,7 +46,7 @@ func (s *VideoService) CreateVideo(ctx context.Context, req *pb.CreateVideoReque
 	}
 	res := &pb.CreateVideoResponse{
 		Video: &pb.Video{
-			Id:          video.ID,
+			Id:          video.Id,
 			Title:       video.Title,
 			Description: video.Description,
 			Url:         video.Url,
@@ -63,7 +63,7 @@ func (s *VideoService) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*
 	}
 	res := &pb.GetVideoResponse{
 		Video: &pb.Video{
-			Id:          video.ID,
+			Id:          video.Id,
 			Title:       video.Title,
 			Description: video.Description,
 			Url:         video.Url,
@@ -96,7 +96,7 @@ func (s *VideoService) ListVideos(ctx context.Context, req *pb.ListVideosRequest
 func (s *VideoService) UpdateVideo(ctx context.Context, req *pb.UpdateVideoRequest) (*pb.UpdateVideoResponse, error) {
 	s.logger.Println("Update video request received")
 	video := model.Video{
-		ID:          req.Video.Id,
+		Id:          req.Video.Id,
 		Title:       req.Video.Title,
 		Description: req.Video.Description,
 		Url:         req.Video.Url,
@@ -107,7 +107,7 @@ func (s *VideoService) UpdateVideo(ctx context.Context, req *pb.UpdateVideoReque
 	}
 	res := &pb.UpdateVideoResponse{
 		Video: &pb.Video{
-			Id:          video.ID,
+			Id:          video.Id,
 			Title:       video.Title,
 			Description: video.Description,
 			Url:         video.Url,
@@ -123,7 +123,9 @@ func (s *VideoService) DeleteVideo(ctx context.Context, req *pb.DeleteVideoReque
 		return nil, err
 	}
 	res := &pb.DeleteVideoResponse{
-		Success: true,
+		Video: &pb.Video{
+			Id: req.Id,
+		}
 	}
 	return res, nil
 }

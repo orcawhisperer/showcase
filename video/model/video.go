@@ -5,6 +5,7 @@ package model
 import (
 	"time"
 
+	"github.com/gosimple/slug"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
@@ -13,8 +14,8 @@ type Video struct {
 	Id          string `gorm:"primaryKey"`
 	Title       string `gorm:"not null"`
 	Description string `gorm:"not null"`
-	URL         string `gorm:"not null"`
-	ChannelID   string `gorm:"not null"`
+	Url         string `gorm:"not null"`
+	ChannelID   string
 	Views       uint64
 	Duration    int32
 	Thumbnail   string
@@ -32,8 +33,12 @@ type Video struct {
 
 // Hook before create to generate uuid and slug
 func (u *Video) BeforeCreate(tx *gorm.DB) error {
-	uuid := uuid.NewV4()
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		return err
+	}
 	u.Id = uuid.String()
-	u.Slug = uuid.String()
+	u.Slug = slug.Make(u.Title)
+	u.Url = "https://www.showcase.com/watch?v=" + u.Slug
 	return nil
 }
