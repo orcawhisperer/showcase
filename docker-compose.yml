@@ -47,6 +47,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "50052:50052"
+      - "8090:8090"
     depends_on:
       - database-service
     environment:
@@ -59,7 +60,7 @@ services:
       - GRPC_HOST=video-service
       - GRPC_PORT=50052
       - HTTP_HOST=video-service
-      - HTTP_PORT=8081
+      - HTTP_PORT=8090
       - LOG_LEVEL=debug
     networks:
       - backend-network

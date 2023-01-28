@@ -11,7 +11,8 @@ import (
 )
 
 type Video struct {
-	Id          string `gorm:"primaryKey"`
+	gorm.Model
+	Uuid        string `gorm:"primaryKey"`
 	Title       string `gorm:"not null"`
 	Description string `gorm:"not null"`
 	Url         string `gorm:"not null"`
@@ -23,7 +24,7 @@ type Video struct {
 	Privacy     string
 	Category    string
 	Language    string
-	Tags        []string
+	Tags        []string `gorm:"type:jsonb"`
 	isDeleted   bool
 	Slug        string `gorm:"uniqueIndex"`
 	CreatedAt   time.Time
@@ -34,7 +35,7 @@ type Video struct {
 // Hook before create to generate uuid and slug
 func (u *Video) BeforeCreate(tx *gorm.DB) error {
 	uuid := uuid.NewV4()
-	u.Id = uuid.String()
+	u.Uuid = uuid.String()
 	u.Slug = slug.Make(u.Title)
 	u.Url = "https://www.showcase.com/watch?v=" + u.Slug
 	return nil

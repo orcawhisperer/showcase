@@ -56,7 +56,7 @@ func (s *VideoServer) CreateVideo(ctx context.Context, req *pb.CreateVideoReques
 	}
 	res := &pb.CreateVideoResponse{
 		Video: &pb.Video{
-			Id:          video.Id,
+			Id:          video.Uuid,
 			Title:       video.Title,
 			Description: video.Description,
 			Url:         video.Url,
@@ -67,13 +67,13 @@ func (s *VideoServer) CreateVideo(ctx context.Context, req *pb.CreateVideoReques
 
 func (s *VideoServer) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*pb.GetVideoResponse, error) {
 	s.log.Println("Get video request received")
-	video, err := s.db.GetVideo(req.Id)
+	video, err := s.db.GetVideoBySlug(req.Slug)
 	if err != nil {
 		return nil, err
 	}
 	res := &pb.GetVideoResponse{
 		Video: &pb.Video{
-			Id:          video.Id,
+			Id:          video.Uuid,
 			Title:       video.Title,
 			Description: video.Description,
 			Url:         video.Url,
@@ -91,7 +91,7 @@ func (s *VideoServer) ListVideos(ctx context.Context, req *pb.ListVideosRequest)
 	var pbVideos []*pb.Video
 	for _, video := range videos {
 		pbVideos = append(pbVideos, &pb.Video{
-			Id:          video.Id,
+			Id:          video.Uuid,
 			Title:       video.Title,
 			Description: video.Description,
 			Url:         video.Url,
@@ -106,7 +106,7 @@ func (s *VideoServer) ListVideos(ctx context.Context, req *pb.ListVideosRequest)
 func (s *VideoServer) UpdateVideo(ctx context.Context, req *pb.UpdateVideoRequest) (*pb.UpdateVideoResponse, error) {
 	s.log.Println("Update video request received")
 	video := model.Video{
-		Id:          req.Video.Id,
+		Uuid:        req.Video.Id,
 		Title:       req.Video.Title,
 		Description: req.Video.Description,
 		Url:         req.Video.Url,
@@ -117,7 +117,7 @@ func (s *VideoServer) UpdateVideo(ctx context.Context, req *pb.UpdateVideoReques
 	}
 	res := &pb.UpdateVideoResponse{
 		Video: &pb.Video{
-			Id:          video.Id,
+			Id:          video.Uuid,
 			Title:       video.Title,
 			Description: video.Description,
 			Url:         video.Url,
@@ -128,13 +128,13 @@ func (s *VideoServer) UpdateVideo(ctx context.Context, req *pb.UpdateVideoReques
 
 func (s *VideoServer) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (*pb.DeleteVideoResponse, error) {
 	s.log.Println("Delete video request received")
-	err := s.db.DeleteVideo(req.Id)
+	err := s.db.DeleteVideo(req.Slug)
 	if err != nil {
 		return nil, err
 	}
 	res := &pb.DeleteVideoResponse{
 		Video: &pb.Video{
-			Id: req.Id,
+			Slug: req.Slug,
 		},
 	}
 	return res, nil

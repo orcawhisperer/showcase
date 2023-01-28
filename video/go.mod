@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/gosimple/slug v1.13.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.0
-	github.com/iamvasanth07/showcase/common v0.0.0-20230128205250-02c796e0f52f
+	github.com/iamvasanth07/showcase/common v0.0.0-20230128214847-d3fdf44a6f45
 	github.com/satori/go.uuid v1.2.0
 	google.golang.org/grpc v1.52.3
 	gorm.io/gorm v1.24.3
