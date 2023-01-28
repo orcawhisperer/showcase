@@ -157,3 +157,17 @@ func ValidateUserGetAll(req *pb.GetAllUserRequest) error {
 	}
 	return nil
 }
+
+// ValidateUserLogin validates user login
+func ValidateUserLogin(req *pb.LoginRequest) error {
+	if req == nil {
+		return fmt.Errorf("body cannot be empty")
+	}
+	if err := ValidateEmail(req.Email); err != nil {
+		return err
+	}
+	if err := ValidatePassword(req.Password); err != nil {
+		return err
+	}
+	return nil
+}

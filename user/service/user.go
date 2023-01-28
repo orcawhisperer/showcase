@@ -9,7 +9,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/iamvasanth07/showcase/common"
 	pb "github.com/iamvasanth07/showcase/common/protos/user"
@@ -17,7 +19,10 @@ import (
 	"github.com/iamvasanth07/showcase/user/model"
 	"github.com/iamvasanth07/showcase/user/repo"
 	"github.com/iamvasanth07/showcase/user/utils"
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
 
@@ -27,6 +32,7 @@ type IUserService interface {
 	Delete(context.Context, *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error)
 	GetAll(context.Context, *pb.GetAllUserRequest) (*pb.GetAllUserResponse, error)
 	Get(context.Context, *pb.GetUserRequest) (*pb.GetUserResponse, error)
+	Login(context.Context, *pb.LoginRequest) (*pb.LoginResponse, error)
 }
 
 type UserServer struct {
@@ -155,6 +161,41 @@ func (s *UserServer) GetAll(ctx context.Context, req *pb.GetAllUserRequest) (*pb
 		Limit: req.Pagination.Limit,
 	}
 	return &pb.GetAllUserResponse{Users: res, Metadata: meta}, nil
+}
+
+// Login user return token
+func (s *UserServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+	if err := utils.ValidateUserLogin(req); err != nil {
+		return nil, err
+	}
+	user, err := s.db.FindByEmail(req.Email)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, status.Error(codes.NotFound, "User not found")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		return nil, status.Error(codes.Unauthenticated, "Invalid credentials")
+	}
+	token, err := s.generateJWTToken(user)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.LoginResponse{
+		Token: token,
+	}, nil
+}
+
+// function to generate JWT token with expiry time
+func (s *UserServer) generateJWTToken(user *model.User) (string, error) {
+	claims := &jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(time.Hour * time.Duration(s.settings.JWT.Expiry)).Unix(),
+		Issuer:    user.Email,
+		User:      user,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(s.settings.JWT.Secret)
 }
 
 func RunServer() {

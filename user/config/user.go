@@ -1,6 +1,9 @@
 package config
 
-import "os"
+import (
+	"os"
+	"strconv"
+)
 
 type server struct {
 	GrpcHost string
@@ -22,15 +25,24 @@ type logger struct {
 	Level string
 }
 
+type jwt struct {
+	Secret string
+	Expiry int
+}
+
 // Settings struct
 type Settings struct {
 	Server   *server
 	Database *database
 	Logger   *logger
+	JWT      *jwt
 }
 
 // GetSettings returns the settings
 func GetSettings() *Settings {
+
+	jwt_expiry, _ := strconv.Atoi(os.Getenv("JWT_EXPIRY"))
+
 	Settings := &Settings{
 		Server: &server{
 			GrpcHost: os.Getenv("GRPC_HOST"),
@@ -50,6 +62,10 @@ func GetSettings() *Settings {
 
 		Logger: &logger{
 			Level: os.Getenv("LOG_LEVEL"),
+		},
+		JWT: &jwt{
+			Secret: os.Getenv("JWT_SECRET"),
+			Expiry: jwt_expiry,
 		},
 	}
 	return Settings

@@ -31,8 +31,8 @@ services:
       - DB_PASSWORD=postgres
       - DB_NAME=postgres
       - DB_SSLMODE=disable
-      - JWT_SECRET=secret
-      - JWT_EXPIRATION=1h
+      - JWT_SECRET=Thisisajwtsecret
+      - JWT_EXPIRY=48
       - GRPC_HOST=user-service
       - GRPC_PORT=50051
       - HTTP_HOST=user-service
