@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/iamvasanth07/showcase/common"
 	pb "github.com/iamvasanth07/showcase/common/protos/user"
 	"github.com/iamvasanth07/showcase/user/config"
@@ -16,6 +18,7 @@ import (
 	"github.com/iamvasanth07/showcase/user/repo"
 	"github.com/iamvasanth07/showcase/user/utils"
 	"google.golang.org/grpc"
+	"gorm.io/gorm"
 )
 
 type IUserService interface {
@@ -166,21 +169,18 @@ func RunServer() {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
 
-	go func() {
-		db := repo.NewUserRepo(conn)
-		userServer := NewUserServer(db, logger, settings)
-		userServer.log.Println("Server started on port: " + settings.Server.Port)
-		lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", settings.Server.Port))
-		if err != nil {
-			log.Fatalf("failed to listen: %v", err)
-		}
-		opts := []grpc.ServerOption{}
-		s := grpc.NewServer(opts...)
-		pb.RegisterUserServiceServer(s, userServer)
-		if err := s.Serve(lis); err != nil {
-			log.Fatalf("failed to serve: %v", err)
-		}
-	}()
+	logger.Println("Migration database...")
+	err = migrateDB(conn)
+	if err != nil {
+		log.Fatalf("failed to migrate db: %v", err)
+	}
+
+	db := repo.NewUserRepo(conn)
+
+	// Starting HTTP server for gRPC gateway
+	go runHTTPServer(settings, db, logger)
+	// Starting gRPC server
+	runGRPCServer(settings, db, logger)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -190,4 +190,46 @@ func RunServer() {
 
 	os.Exit(0)
 
+}
+
+func migrateDB(db *gorm.DB) error {
+	return db.AutoMigrate(
+		&model.User{},
+	)
+}
+
+func runGRPCServer(settings *config.Settings, db *repo.UserRepo, logger *log.Logger) {
+	userServer := NewUserServer(db, logger, settings)
+	opts := []grpc.ServerOption{}
+	s := grpc.NewServer(opts...)
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.GrpcHost, settings.Server.GrcpPort))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	pb.RegisterUserServiceServer(s, userServer)
+	logger.Println("GRPC Server started on port: " + settings.Server.GrcpPort)
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve grpc server: %v", err)
+	}
+}
+
+func runHTTPServer(settings *config.Settings, db *repo.UserRepo, logger *log.Logger) {
+	userServer := NewUserServer(db, logger, settings)
+	grpcMux := runtime.NewServeMux()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	err := pb.RegisterUserServiceHandlerServer(ctx, grpcMux, userServer)
+	if err != nil {
+		log.Fatalf("failed to register the handler to the server: %v", err)
+	}
+	mux := http.NewServeMux()
+	mux.Handle("/", grpcMux)
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.HTTPHost, settings.Server.HTTPPort))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	logger.Println("HTTP Server started on port: " + settings.Server.HTTPPort)
+	if err := http.Serve(lis, mux); err != nil {
+		log.Fatalf("failed to serv http server: %v", err)
+	}
 }

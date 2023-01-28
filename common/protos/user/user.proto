@@ -38,6 +38,14 @@ service UserService {
       delete: "/v1/user/{id}"
     };
   }
+
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/login"
+      body: "*"
+    };
+  }
+
 }
 
 // The request message containing the user's id.
@@ -52,7 +60,7 @@ message GetUserResponse {
 
 // Get All User Request
 message GetAllUserRequest {
-    Pagination pagination = 1;
+    Pagination paginate = 1;
 }
 
 // The response message containing the list of user.
@@ -114,6 +122,14 @@ message Metadata {
   int32 total = 3;
 }
 
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
 
 
 

@@ -21,6 +21,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - 50051:50051
+      - 8080:8080
     depends_on:
       - database-service
     environment:
@@ -32,8 +33,10 @@ services:
       - DB_SSLMODE=disable
       - JWT_SECRET=secret
       - JWT_EXPIRATION=1h
-      - SERVER_HOST=user-service
-      - SERVER_PORT=50051
+      - GRPC_HOST=user-service
+      - GRPC_PORT=50051
+      - HTTP_HOST=user-service
+      - HTTP_PORT=8080
       - LOG_LEVEL=debug
     networks:
       - backend-network

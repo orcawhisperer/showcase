@@ -7,6 +7,25 @@ import (
 	"github.com/iamvasanth07/showcase/user/model"
 )
 
+const NotValidPassword = `*** NOT MATCH
+abc
+abc123
+abC12312
+123Abc!!d
+*** MATCH
+1Ab@1Ab@
+%D123!cc
+
+# ### NOTES
+# - 8 characters long
+# - Must include capital letters
+# - Must include small letters
+# - Must include numbers
+# - Must include special characters
+# - NOTE: Can also use [[:punct:]] for special characters but it may not be supported by your regex engine.
+
+`
+
 // ValidateEmail validates email
 func ValidateEmail(email string) error {
 	if email == "" {
@@ -73,6 +92,9 @@ func ValidateID(id string) error {
 
 // ValidateUserCreate validates user
 func ValidateUserCreate(user *pb.User) error {
+	if user == nil {
+		return fmt.Errorf("user is required")
+	}
 	if err := ValidateEmail(user.Email); err != nil {
 		return err
 	}
@@ -91,6 +113,9 @@ func ValidateUserCreate(user *pb.User) error {
 // ValidateUserUpdate validates user update
 func ValidateUserUpdate(user *pb.User) error {
 
+	if user == nil {
+		return fmt.Errorf("user is required")
+	}
 	if err := ValidateEmail(user.Email); err != nil {
 		return err
 	}
@@ -121,10 +146,13 @@ func ValidateUserGet(id string) error {
 
 // ValidateUserGetAll validates user get all
 func ValidateUserGetAll(req *pb.GetAllUserRequest) error {
-	if req.Pagination.Limit < 0 {
+	if req.Paginate == nil {
+		return fmt.Errorf("pagination is required")
+	}
+	if req.Paginate.Limit < 0 {
 		return fmt.Errorf("invalid limit")
 	}
-	if req.Pagination.Page < 0 {
+	if req.Paginate.Page < 0 {
 		return fmt.Errorf("invalid page")
 	}
 	return nil

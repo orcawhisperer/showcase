@@ -15,7 +15,7 @@ var (
 
 	PhoneRegex = regexp.MustCompile(`^[0-9]{10}$`)
 
-	PasswordRegex = regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*]{8,30}$`)
+	PasswordRegex = regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*]{8,}$`)
 
 	NameRegex = regexp.MustCompile(`^[a-zA-Z ]+$`)
 
@@ -25,7 +25,7 @@ var (
 type User struct {
 	Id       string `gorm:"primary_key"`
 	Name     string
-	Email    string `gorm:"unique_index"`
+	Email    string `gorm:"unique_index;"`
 	Phone    string `gorm:"unique_index"`
 	Password string
 }
