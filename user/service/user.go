@@ -10,7 +10,7 @@ import (
 	"os/signal"
 
 	"github.com/iamvasanth07/showcase/common"
-	pb "github.com/iamvasanth07/showcase/common/protos"
+	pb "github.com/iamvasanth07/showcase/common/protos/user"
 	"github.com/iamvasanth07/showcase/user/config"
 	"github.com/iamvasanth07/showcase/user/model"
 	"github.com/iamvasanth07/showcase/user/repo"

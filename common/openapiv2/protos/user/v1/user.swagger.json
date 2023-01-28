@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "user.proto",
+    "title": "protos/user/v1/user.proto",
     "version": "version not set"
   },
   "tags": [
@@ -23,7 +23,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protosGetAllUserResponse"
+              "$ref": "#/definitions/v1GetAllUserResponse"
             }
           },
           "default": {
@@ -59,7 +59,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protosCreateUserResponse"
+              "$ref": "#/definitions/v1CreateUserResponse"
             }
           },
           "default": {
@@ -75,7 +75,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protosCreateUserRequest"
+              "$ref": "#/definitions/v1CreateUserRequest"
             }
           }
         ],
@@ -91,7 +91,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protosGetUserResponse"
+              "$ref": "#/definitions/v1GetUserResponse"
             }
           },
           "default": {
@@ -119,7 +119,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protosDeleteUserResponse"
+              "$ref": "#/definitions/v1DeleteUserResponse"
             }
           },
           "default": {
@@ -147,7 +147,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protosUpdateUserResponse"
+              "$ref": "#/definitions/v1UpdateUserResponse"
             }
           },
           "default": {
@@ -172,7 +172,7 @@
               "type": "object",
               "properties": {
                 "user": {
-                  "$ref": "#/definitions/protosUser"
+                  "$ref": "#/definitions/v1User"
                 }
               },
               "description": "The request message containing the user."
@@ -195,25 +195,43 @@
       },
       "additionalProperties": {}
     },
-    "protosCreateUserRequest": {
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateUserRequest": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protosUser"
+          "$ref": "#/definitions/v1User"
         }
       },
       "description": "The request message containing the user."
     },
-    "protosCreateUserResponse": {
+    "v1CreateUserResponse": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protosUser"
+          "$ref": "#/definitions/v1User"
         }
       },
       "description": "The response message containing the user."
     },
-    "protosDeleteUserResponse": {
+    "v1DeleteUserResponse": {
       "type": "object",
       "properties": {
         "id": {
@@ -222,31 +240,31 @@
       },
       "description": "The response message containing the user's id."
     },
-    "protosGetAllUserResponse": {
+    "v1GetAllUserResponse": {
       "type": "object",
       "properties": {
         "users": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/protosUser"
+            "$ref": "#/definitions/v1User"
           }
         },
         "metadata": {
-          "$ref": "#/definitions/protosMetadata"
+          "$ref": "#/definitions/v1Metadata"
         }
       },
       "description": "The response message containing the list of user."
     },
-    "protosGetUserResponse": {
+    "v1GetUserResponse": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protosUser"
+          "$ref": "#/definitions/v1User"
         }
       },
       "description": "The response message containing the user."
     },
-    "protosMetadata": {
+    "v1Metadata": {
       "type": "object",
       "properties": {
         "page": {
@@ -264,7 +282,7 @@
       },
       "description": "Metadata message."
     },
-    "protosPagination": {
+    "v1Pagination": {
       "type": "object",
       "properties": {
         "page": {
@@ -278,16 +296,16 @@
       },
       "title": "pagination"
     },
-    "protosUpdateUserResponse": {
+    "v1UpdateUserResponse": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protosUser"
+          "$ref": "#/definitions/v1User"
         }
       },
       "description": "The response message containing the user."
     },
-    "protosUser": {
+    "v1User": {
       "type": "object",
       "properties": {
         "id": {
@@ -307,24 +325,6 @@
         }
       },
       "description": "User message."
-    },
-    "rpcStatus": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
-          "type": "string"
-        },
-        "details": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufAny"
-          }
-        }
-      }
     }
   }
 }

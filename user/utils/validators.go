@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 
-	pb "github.com/iamvasanth07/showcase/common/protos"
+	pb "github.com/iamvasanth07/showcase/common/protos/user"
 	"github.com/iamvasanth07/showcase/user/model"
 )
 

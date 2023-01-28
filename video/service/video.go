@@ -11,7 +11,7 @@ import (
 	"os/signal"
 
 	"github.com/iamvasanth07/showcase/common"
-	pb "github.com/iamvasanth07/showcase/common/protos"
+	pb "github.com/iamvasanth07/showcase/common/protos/video"
 	"github.com/iamvasanth07/showcase/video/config"
 	"github.com/iamvasanth07/showcase/video/model"
 	"github.com/iamvasanth07/showcase/video/repo"
@@ -26,22 +26,22 @@ type IVideoService interface {
 	DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (*pb.DeleteVideoResponse, error)
 }
 
-type VideoService struct {
+type VideoServer struct {
 	db       *repo.VideoRepo
 	log      *log.Logger
 	settings *config.Settings
 	pb.UnimplementedVideoServiceServer
 }
 
-func NewVideoService(db *repo.VideoRepo, logger *log.Logger, settings *config.Settings) *VideoService {
-	return &VideoService{
+func NewVideoService(db *repo.VideoRepo, logger *log.Logger, settings *config.Settings) *VideoServer {
+	return &VideoServer{
 		db:       db,
 		log:      logger,
 		settings: settings,
 	}
 }
 
-func (s *VideoService) CreateVideo(ctx context.Context, req *pb.CreateVideoRequest) (*pb.CreateVideoResponse, error) {
+func (s *VideoServer) CreateVideo(ctx context.Context, req *pb.CreateVideoRequest) (*pb.CreateVideoResponse, error) {
 	s.log.Println("Create video request received")
 	video := model.Video{
 		Title:       req.Video.Title,
@@ -63,7 +63,7 @@ func (s *VideoService) CreateVideo(ctx context.Context, req *pb.CreateVideoReque
 	return res, nil
 }
 
-func (s *VideoService) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*pb.GetVideoResponse, error) {
+func (s *VideoServer) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*pb.GetVideoResponse, error) {
 	s.log.Println("Get video request received")
 	video, err := s.db.GetVideo(req.Id)
 	if err != nil {
@@ -80,7 +80,7 @@ func (s *VideoService) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*
 	return res, nil
 }
 
-func (s *VideoService) ListVideos(ctx context.Context, req *pb.ListVideosRequest) (*pb.ListVideosResponse, error) {
+func (s *VideoServer) ListVideos(ctx context.Context, req *pb.ListVideosRequest) (*pb.ListVideosResponse, error) {
 	s.log.Println("List videos request received")
 	videos, err := s.db.ListVideos(int(req.Page), int(req.Limit))
 	if err != nil {
@@ -101,7 +101,7 @@ func (s *VideoService) ListVideos(ctx context.Context, req *pb.ListVideosRequest
 	return res, nil
 }
 
-func (s *VideoService) UpdateVideo(ctx context.Context, req *pb.UpdateVideoRequest) (*pb.UpdateVideoResponse, error) {
+func (s *VideoServer) UpdateVideo(ctx context.Context, req *pb.UpdateVideoRequest) (*pb.UpdateVideoResponse, error) {
 	s.log.Println("Update video request received")
 	video := model.Video{
 		Id:          req.Video.Id,
@@ -124,7 +124,7 @@ func (s *VideoService) UpdateVideo(ctx context.Context, req *pb.UpdateVideoReque
 	return res, nil
 }
 
-func (s *VideoService) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (*pb.DeleteVideoResponse, error) {
+func (s *VideoServer) DeleteVideo(ctx context.Context, req *pb.DeleteVideoRequest) (*pb.DeleteVideoResponse, error) {
 	s.log.Println("Delete video request received")
 	err := s.db.DeleteVideo(req.Id)
 	if err != nil {

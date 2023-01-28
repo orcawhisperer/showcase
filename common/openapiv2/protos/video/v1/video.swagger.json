@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "video.proto",
+    "title": "protos/video/v1/video.proto",
     "version": "version not set"
   },
   "tags": [
@@ -26,59 +26,77 @@
       },
       "additionalProperties": {}
     },
-    "protosCreateVideoResponse": {
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateVideoResponse": {
       "type": "object",
       "properties": {
         "video": {
-          "$ref": "#/definitions/protosVideo",
+          "$ref": "#/definitions/v1Video",
           "title": "The created video"
         }
       },
       "title": "CreateVideoResponse is the response for the CreateVideo method"
     },
-    "protosDeleteVideoResponse": {
+    "v1DeleteVideoResponse": {
       "type": "object",
       "properties": {
         "video": {
-          "$ref": "#/definitions/protosVideo",
+          "$ref": "#/definitions/v1Video",
           "title": "The deleted video"
         }
       },
       "title": "DeleteVideoResponse is the response for the DeleteVideo method"
     },
-    "protosGetVideoResponse": {
+    "v1GetVideoResponse": {
       "type": "object",
       "properties": {
         "video": {
-          "$ref": "#/definitions/protosVideo",
+          "$ref": "#/definitions/v1Video",
           "title": "The retrieved video"
         }
       },
       "title": "GetVideoResponse is the response for the GetVideo method"
     },
-    "protosListVideosResponse": {
+    "v1ListVideosResponse": {
       "type": "object",
       "properties": {
         "videos": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/protosVideo"
+            "$ref": "#/definitions/v1Video"
           }
         }
       },
       "title": "ListVideosResponse is the response for the ListVideos method"
     },
-    "protosUpdateVideoResponse": {
+    "v1UpdateVideoResponse": {
       "type": "object",
       "properties": {
         "video": {
-          "$ref": "#/definitions/protosVideo",
+          "$ref": "#/definitions/v1Video",
           "title": "The updated video"
         }
       },
       "title": "UpdateVideoResponse is the response for the UpdateVideo method"
     },
-    "protosVideo": {
+    "v1Video": {
       "type": "object",
       "properties": {
         "id": {
@@ -130,24 +148,6 @@
         }
       },
       "title": "Video message"
-    },
-    "rpcStatus": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
-          "type": "string"
-        },
-        "details": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufAny"
-          }
-        }
-      }
     }
   }
 }

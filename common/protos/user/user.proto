@@ -3,9 +3,9 @@
 syntax = "proto3";
 
 
-package protos;
+package user;
 
-option go_package = "github.com/iamvasanth07/showcase/common/protos";
+option go_package = "github.com/iamvasanth07/showcase/common/protos/user";
 
 import "google/api/annotations.proto";
 
