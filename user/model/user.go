@@ -24,12 +24,12 @@ var (
 
 type User struct {
 	gorm.Model
-	UUID      string `gorm:"primary_key" json:"id"`
+	UUID      string `gorm:"primaryKey" json:"id"`
 	FirstName string `gorm:"not null" json:"first_name"`
 	LastName  string `gorm:"not null" json:"last_name"`
-	Username  string `gorm:"unique_index" json:"username"`
-	Email     string `gorm:"unique_index" json:"email"`
-	Phone     string `gorm:"unique_index" json:"phone"`
+	Username  string `gorm:"uniqueIndex" json:"username"`
+	Email     string `gorm:"uniqueIndex" json:"email"`
+	Phone     string `gorm:"uniqueIndex" json:"phone"`
 	Password  string `gorm:"not null" json:"-"`
 }
 

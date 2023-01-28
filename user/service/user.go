@@ -55,6 +55,7 @@ func (s *UserServer) Create(ctx context.Context, req *pb.CreateUserRequest) (*pb
 		return nil, err
 	}
 	user := ProtoToUser(req.User)
+	user.Password = req.User.Password
 	err := s.db.Create(user)
 	if err != nil {
 		return nil, err
@@ -149,7 +150,6 @@ func (s *UserServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 		return nil, status.Error(codes.NotFound, "User not found")
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		s.log.Println(user.Password, req.Password)
 		return nil, status.Error(codes.Unauthenticated, "Invalid credentials")
 	}
 	token, err := s.generateJWTToken(user)
@@ -168,7 +168,7 @@ func (s *UserServer) generateJWTToken(user *model.User) (string, error) {
 		Issuer:    user.Email,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(s.settings.JWT.Secret)
+	return token.SignedString([]byte(s.settings.JWT.Secret))
 }
 
 func RunServer() {

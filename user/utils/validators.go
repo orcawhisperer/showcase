@@ -35,16 +35,27 @@ func ValidatePassword(password string) error {
 	return nil
 }
 
-// ValidateName validates name
-func ValidateName(name string) error {
-	if name == "" {
-		return fmt.Errorf("name is required")
+// ValidateUsername validates username
+func ValidateUserName(username string) error {
+	if username == "" {
+		return fmt.Errorf("username is required")
 	}
-	if len(name) > 100 {
-		return fmt.Errorf("name is too long")
+	if len(username) < 3 {
+		return fmt.Errorf("username is too short")
 	}
-	if !model.NameRegex.MatchString(name) {
-		return fmt.Errorf("invalid name")
+	if len(username) > 100 {
+		return fmt.Errorf("username is too long")
+	}
+	return nil
+}
+
+// ValidateName validates Firstname and Lastname
+func ValidateName(firstName string, lastName string) error {
+	if firstName == "" {
+		return fmt.Errorf("firstname is required")
+	}
+	if lastName == "" {
+		return fmt.Errorf("lastname is required")
 	}
 	return nil
 }
@@ -82,7 +93,10 @@ func ValidateUserCreate(user *pb.User) error {
 	if err := ValidatePassword(user.Password); err != nil {
 		return err
 	}
-	if err := ValidateName(user.Name); err != nil {
+	if err := ValidateUserName(user.Username); err != nil {
+		return err
+	}
+	if err := ValidateName(user.FirstName, user.LastName); err != nil {
 		return err
 	}
 	if err := ValidatePhone(user.Phone); err != nil {
@@ -100,7 +114,7 @@ func ValidateUserUpdate(user *pb.User) error {
 	if err := ValidateEmail(user.Email); err != nil {
 		return err
 	}
-	if err := ValidateName(user.Name); err != nil {
+	if err := ValidateName(user.FirstName, user.LastName); err != nil {
 		return err
 	}
 	if err := ValidatePhone(user.Phone); err != nil {
