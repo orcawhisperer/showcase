@@ -23,17 +23,20 @@ var (
 )
 
 type User struct {
-	Id       string `gorm:"primary_key"`
-	Name     string
-	Email    string `gorm:"unique_index;"`
-	Phone    string `gorm:"unique_index"`
-	Password string
+	gorm.Model
+	UUID      string `gorm:"primary_key" json:"id"`
+	FirstName string `gorm:"not null" json:"first_name"`
+	LastName  string `gorm:"not null" json:"last_name"`
+	Username  string `gorm:"unique_index" json:"username"`
+	Email     string `gorm:"unique_index" json:"email"`
+	Phone     string `gorm:"unique_index" json:"phone"`
+	Password  string `gorm:"not null" json:"-"`
 }
 
 // Hook before create to generate uuid and hash password
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	uuid := uuid.NewV4()
-	u.Id = uuid.String()
+	u.UUID = uuid.String()
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err

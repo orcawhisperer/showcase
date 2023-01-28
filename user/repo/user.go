@@ -21,7 +21,13 @@ func NewUserRepo(db *gorm.DB) *UserRepo {
 }
 
 func (r *UserRepo) Create(user *model.User) error {
-	return r.db.Create(user).Error
+	result := r.db.Create(user)
+	if result.Error != nil {
+		return result.Error
+	}
+	r.log.Printf("%d", result.RowsAffected)
+	r.log.Println(user.Id)
+	return nil
 }
 
 func (r *UserRepo) FindByEmail(email string) (*model.User, error) {

@@ -142,7 +142,7 @@ func (s *UserServer) GetAll(ctx context.Context, req *pb.GetAllUserRequest) (*pb
 	if err := utils.ValidateUserGetAll(req); err != nil {
 		return nil, err
 	}
-	users, err := s.db.FindAll(req.Pagination.Page, req.Pagination.Limit)
+	users, err := s.db.FindAll(req.Paginate.Page, req.Paginate.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -157,8 +157,8 @@ func (s *UserServer) GetAll(ctx context.Context, req *pb.GetAllUserRequest) (*pb
 	}
 	meta = &pb.Metadata{
 		Total: int32(len(res)),
-		Page:  req.Pagination.Page,
-		Limit: req.Pagination.Limit,
+		Page:  req.Paginate.Page,
+		Limit: req.Paginate.Limit,
 	}
 	return &pb.GetAllUserResponse{Users: res, Metadata: meta}, nil
 }
@@ -176,6 +176,7 @@ func (s *UserServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 		return nil, status.Error(codes.NotFound, "User not found")
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		s.log.Println(user.Password, req.Password)
 		return nil, status.Error(codes.Unauthenticated, "Invalid credentials")
 	}
 	token, err := s.generateJWTToken(user)
@@ -192,7 +193,6 @@ func (s *UserServer) generateJWTToken(user *model.User) (string, error) {
 	claims := &jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(time.Hour * time.Duration(s.settings.JWT.Expiry)).Unix(),
 		Issuer:    user.Email,
-		User:      user,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(s.settings.JWT.Secret)

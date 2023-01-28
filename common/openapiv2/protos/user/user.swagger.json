@@ -362,7 +362,13 @@
         "id": {
           "type": "string"
         },
-        "name": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "username": {
           "type": "string"
         },
         "email": {

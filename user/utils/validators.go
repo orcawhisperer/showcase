@@ -7,25 +7,6 @@ import (
 	"github.com/iamvasanth07/showcase/user/model"
 )
 
-const NotValidPassword = `*** NOT MATCH
-abc
-abc123
-abC12312
-123Abc!!d
-*** MATCH
-1Ab@1Ab@
-%D123!cc
-
-# ### NOTES
-# - 8 characters long
-# - Must include capital letters
-# - Must include small letters
-# - Must include numbers
-# - Must include special characters
-# - NOTE: Can also use [[:punct:]] for special characters but it may not be supported by your regex engine.
-
-`
-
 // ValidateEmail validates email
 func ValidateEmail(email string) error {
 	if email == "" {
@@ -146,8 +127,11 @@ func ValidateUserGet(id string) error {
 
 // ValidateUserGetAll validates user get all
 func ValidateUserGetAll(req *pb.GetAllUserRequest) error {
+	if req == nil {
+		return fmt.Errorf("body cannot be empty")
+	}
 	if req.Paginate == nil {
-		return fmt.Errorf("pagination is required")
+		return fmt.Errorf("paginate options cannot be empty")
 	}
 	if req.Paginate.Limit < 0 {
 		return fmt.Errorf("invalid limit")
