@@ -54,11 +54,7 @@ func (s *UserServer) Create(ctx context.Context, req *pb.CreateUserRequest) (*pb
 	if err := utils.ValidateUserCreate(req.User); err != nil {
 		return nil, err
 	}
-	user := &model.User{
-		Name:  req.User.Name,
-		Email: req.User.Email,
-		Phone: req.User.Phone,
-	}
+	user := ProtoToUser(req.User)
 	err := s.db.Create(user)
 	if err != nil {
 		return nil, err
@@ -68,12 +64,7 @@ func (s *UserServer) Create(ctx context.Context, req *pb.CreateUserRequest) (*pb
 		return nil, err
 	}
 	return &pb.CreateUserResponse{
-		User: &pb.User{
-			Id:    getUser.Id,
-			Name:  getUser.Name,
-			Email: getUser.Email,
-			Phone: getUser.Phone,
-		},
+		User: UserToProto(getUser),
 	}, nil
 }
 
@@ -82,11 +73,7 @@ func (s *UserServer) Update(ctx context.Context, req *pb.UpdateUserRequest) (*pb
 		return nil, err
 	}
 
-	user := &model.User{
-		Name:  req.User.Name,
-		Email: req.User.Email,
-		Phone: req.User.Phone,
-	}
+	user := ProtoToUser(req.User)
 	err := s.db.Update(user)
 	if err != nil {
 		return nil, err
@@ -96,12 +83,7 @@ func (s *UserServer) Update(ctx context.Context, req *pb.UpdateUserRequest) (*pb
 		return nil, err
 	}
 	return &pb.UpdateUserResponse{
-		User: &pb.User{
-			Id:    getUser.Id,
-			Name:  getUser.Name,
-			Email: getUser.Email,
-			Phone: getUser.Phone,
-		},
+		User: UserToProto(getUser),
 	}, nil
 }
 
@@ -115,12 +97,7 @@ func (s *UserServer) Get(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUs
 		return nil, err
 	}
 	return &pb.GetUserResponse{
-		User: &pb.User{
-			Id:    user.Id,
-			Name:  user.Name,
-			Email: user.Email,
-			Phone: user.Phone,
-		},
+		User: UserToProto(user),
 	}, nil
 }
 
@@ -149,11 +126,7 @@ func (s *UserServer) GetAll(ctx context.Context, req *pb.GetAllUserRequest) (*pb
 	var res []*pb.User
 	var meta *pb.Metadata
 	for _, user := range users {
-		res = append(res, &pb.User{
-			Name:  user.Name,
-			Email: user.Email,
-			Phone: user.Phone,
-		})
+		res = append(res, UserToProto(user))
 	}
 	meta = &pb.Metadata{
 		Total: int32(len(res)),

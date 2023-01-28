@@ -21,13 +21,7 @@ func NewUserRepo(db *gorm.DB) *UserRepo {
 }
 
 func (r *UserRepo) Create(user *model.User) error {
-	result := r.db.Create(user)
-	if result.Error != nil {
-		return result.Error
-	}
-	r.log.Printf("%d", result.RowsAffected)
-	r.log.Println(user.Id)
-	return nil
+	return r.db.Create(user).Error
 }
 
 func (r *UserRepo) FindByEmail(email string) (*model.User, error) {
@@ -50,7 +44,7 @@ func (r *UserRepo) FindByPhone(phone string) (*model.User, error) {
 
 func (r *UserRepo) FindByID(id string) (*model.User, error) {
 	user := &model.User{}
-	err := r.db.Where("id = ?", id).First(user).Error
+	err := r.db.Where("uuid = ?", id).First(user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +57,7 @@ func (r *UserRepo) Update(user *model.User) error {
 
 func (r *UserRepo) Delete(id string) error {
 	user := &model.User{}
-	user.Id = id
+	user.UUID = id
 	return r.db.Delete(user).Error
 }
 
