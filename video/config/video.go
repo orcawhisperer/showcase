@@ -29,7 +29,6 @@ type Settings struct {
 	Server   *server
 	Database *database
 	Logger   *logger
-	JWT      *jwt
 }
 
 // GetSettings returns the settings

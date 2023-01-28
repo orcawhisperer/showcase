@@ -140,41 +140,6 @@ func (s *VideoServer) DeleteVideo(ctx context.Context, req *pb.DeleteVideoReques
 	return res, nil
 }
 
-//func RunServer() {
-//	logger := log.New(os.Stdout, "video-service ", log.LstdFlags)
-//	settings := config.GetSettings()
-//	logger.Println("Initializing user service with settings...")
-//	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
-//	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
-//	conn, err := common.GetDBConnection(dsn)
-//	if err != nil {
-//		log.Fatalf("failed to connect to database: %v", err)
-//	}
-//	go func() {
-//		repo := repo.NewVideoRepo(conn)
-//		s := NewVideoService(repo, logger, settings)
-//		s.log.Println("Video service started on port " + settings.Server.Port)
-//		lis, err := net.Listen("tcp", "localhost:"+settings.Server.Port)
-//		if err != nil {
-//			log.Fatalf("failed to listen: %v", err)
-//		}
-//		srv := grpc.NewServer()
-//		pb.RegisterVideoServiceServer(srv, s)
-//		if err := srv.Serve(lis); err != nil {
-//			log.Fatalf("failed to serve: %v", err)
-//		}
-//	}()
-//
-//	c := make(chan os.Signal, 1)
-//	signal.Notify(c, os.Interrupt)
-//
-//	// Block until a signal is received.
-//	<-c
-//	logger.Println("Shutting down video service...")
-//	os.Exit(0)
-//
-//}
-
 func RunServer() {
 
 	logger := log.New(os.Stdout, "video-service: ", log.LstdFlags)
