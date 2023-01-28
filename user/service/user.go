@@ -19,7 +19,7 @@ import (
 )
 
 type IUserService interface {
-	Create(context.Context, *pb.CreateUserRequest) (*pb.CreateUserResponse, error)
+	Create(context.Context, *pb.CreateUserRequest) (*pb.CreateUserRequest, error)
 	Update(context.Context, *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error)
 	Delete(context.Context, *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error)
 	GetAll(context.Context, *pb.GetAllUserRequest) (*pb.GetAllUserResponse, error)
