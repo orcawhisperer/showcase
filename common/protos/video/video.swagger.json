@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "protos/user/v1/user.proto",
+    "title": "protos/video/video.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "UserService"
+      "name": "VideoService"
     }
   ],
   "consumes": [
@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/user": {
+    "/api/v1/videos": {
       "get": {
-        "operationId": "UserService_GetAll",
+        "operationId": "VideoService_ListVideos",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetAllUserResponse"
+              "$ref": "#/definitions/videoListVideosResponse"
             }
           },
           "default": {
@@ -35,14 +35,14 @@
         },
         "parameters": [
           {
-            "name": "pagination.page",
+            "name": "page",
             "in": "query",
             "required": false,
             "type": "integer",
             "format": "int32"
           },
           {
-            "name": "pagination.limit",
+            "name": "limit",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -50,16 +50,16 @@
           }
         ],
         "tags": [
-          "UserService"
+          "VideoService"
         ]
       },
       "post": {
-        "operationId": "UserService_Create",
+        "operationId": "VideoService_CreateVideo",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1CreateUserResponse"
+              "$ref": "#/definitions/videoCreateVideoResponse"
             }
           },
           "default": {
@@ -75,23 +75,23 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1CreateUserRequest"
+              "$ref": "#/definitions/videoCreateVideoRequest"
             }
           }
         ],
         "tags": [
-          "UserService"
+          "VideoService"
         ]
       }
     },
-    "/v1/user/{id}": {
+    "/api/v1/videos/{slug}": {
       "get": {
-        "operationId": "UserService_Get",
+        "operationId": "VideoService_GetVideo",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetUserResponse"
+              "$ref": "#/definitions/videoGetVideoResponse"
             }
           },
           "default": {
@@ -103,23 +103,24 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "slug",
+            "description": "The id of the video to retrieve",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "UserService"
+          "VideoService"
         ]
       },
       "delete": {
-        "operationId": "UserService_Delete",
+        "operationId": "VideoService_DeleteVideo",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1DeleteUserResponse"
+              "$ref": "#/definitions/videoDeleteVideoResponse"
             }
           },
           "default": {
@@ -131,23 +132,26 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "slug",
+            "description": "The id of the video to delete",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "UserService"
+          "VideoService"
         ]
-      },
+      }
+    },
+    "/api/v1/videos/{video.slug}": {
       "put": {
-        "operationId": "UserService_Update",
+        "operationId": "VideoService_UpdateVideo",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpdateUserResponse"
+              "$ref": "#/definitions/videoUpdateVideoResponse"
             }
           },
           "default": {
@@ -159,7 +163,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "video.slug",
             "in": "path",
             "required": true,
             "type": "string"
@@ -169,18 +173,12 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "user": {
-                  "$ref": "#/definitions/v1User"
-                }
-              },
-              "description": "The request message containing the user."
+              "$ref": "#/definitions/videoUpdateVideoRequest"
             }
           }
         ],
         "tags": [
-          "UserService"
+          "VideoService"
         ]
       }
     }
@@ -213,118 +211,133 @@
         }
       }
     },
-    "v1CreateUserRequest": {
+    "videoCreateVideoRequest": {
       "type": "object",
       "properties": {
-        "user": {
-          "$ref": "#/definitions/v1User"
+        "video": {
+          "$ref": "#/definitions/videoVideo",
+          "title": "The video to create"
         }
       },
-      "description": "The request message containing the user."
+      "title": "CreateVideoRequest is the request for the CreateVideo method"
     },
-    "v1CreateUserResponse": {
+    "videoCreateVideoResponse": {
       "type": "object",
       "properties": {
-        "user": {
-          "$ref": "#/definitions/v1User"
+        "video": {
+          "$ref": "#/definitions/videoVideo",
+          "title": "The created video"
         }
       },
-      "description": "The response message containing the user."
+      "title": "CreateVideoResponse is the response for the CreateVideo method"
     },
-    "v1DeleteUserResponse": {
+    "videoDeleteVideoResponse": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
+        "video": {
+          "$ref": "#/definitions/videoVideo",
+          "title": "The deleted video"
         }
       },
-      "description": "The response message containing the user's id."
+      "title": "DeleteVideoResponse is the response for the DeleteVideo method"
     },
-    "v1GetAllUserResponse": {
+    "videoGetVideoResponse": {
       "type": "object",
       "properties": {
-        "users": {
+        "video": {
+          "$ref": "#/definitions/videoVideo",
+          "title": "The retrieved video"
+        }
+      },
+      "title": "GetVideoResponse is the response for the GetVideo method"
+    },
+    "videoListVideosResponse": {
+      "type": "object",
+      "properties": {
+        "videos": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1User"
+            "$ref": "#/definitions/videoVideo"
           }
-        },
-        "metadata": {
-          "$ref": "#/definitions/v1Metadata"
         }
       },
-      "description": "The response message containing the list of user."
+      "title": "ListVideosResponse is the response for the ListVideos method"
     },
-    "v1GetUserResponse": {
+    "videoUpdateVideoRequest": {
       "type": "object",
       "properties": {
-        "user": {
-          "$ref": "#/definitions/v1User"
+        "video": {
+          "$ref": "#/definitions/videoVideo",
+          "title": "The video to update"
         }
       },
-      "description": "The response message containing the user."
+      "title": "UpdateVideoRequest is the request for the UpdateVideo method"
     },
-    "v1Metadata": {
+    "videoUpdateVideoResponse": {
       "type": "object",
       "properties": {
-        "page": {
-          "type": "integer",
-          "format": "int32"
+        "slug": {
+          "type": "string",
+          "title": "The updated video"
         },
-        "limit": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "total": {
-          "type": "integer",
-          "format": "int32"
+        "video": {
+          "$ref": "#/definitions/videoVideo"
         }
       },
-      "description": "Metadata message."
+      "title": "UpdateVideoResponse is the response for the UpdateVideo method"
     },
-    "v1Pagination": {
-      "type": "object",
-      "properties": {
-        "page": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "limit": {
-          "type": "integer",
-          "format": "int32"
-        }
-      },
-      "title": "pagination"
-    },
-    "v1UpdateUserResponse": {
-      "type": "object",
-      "properties": {
-        "user": {
-          "$ref": "#/definitions/v1User"
-        }
-      },
-      "description": "The response message containing the user."
-    },
-    "v1User": {
+    "videoVideo": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string"
         },
-        "name": {
+        "title": {
           "type": "string"
         },
-        "email": {
+        "description": {
           "type": "string"
         },
-        "password": {
+        "url": {
           "type": "string"
         },
-        "phone": {
+        "channelId": {
+          "type": "string"
+        },
+        "views": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "duration": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "thumbnail": {
+          "type": "string"
+        },
+        "publishedAt": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "slug": {
           "type": "string"
         }
       },
-      "description": "User message."
+      "title": "Video message"
     }
   }
 }

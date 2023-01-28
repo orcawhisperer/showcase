@@ -5,17 +5,19 @@ package service
 import (
 	"context"
 	"fmt"
-	"log"
-	"net"
-	"os"
-	"os/signal"
-
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/iamvasanth07/showcase/common"
 	pb "github.com/iamvasanth07/showcase/common/protos/video"
 	"github.com/iamvasanth07/showcase/video/config"
 	"github.com/iamvasanth07/showcase/video/model"
 	"github.com/iamvasanth07/showcase/video/repo"
 	"google.golang.org/grpc"
+	"gorm.io/gorm"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
 )
 
 type IVideoService interface {
@@ -138,37 +140,118 @@ func (s *VideoServer) DeleteVideo(ctx context.Context, req *pb.DeleteVideoReques
 	return res, nil
 }
 
+//func RunServer() {
+//	logger := log.New(os.Stdout, "video-service ", log.LstdFlags)
+//	settings := config.GetSettings()
+//	logger.Println("Initializing user service with settings...")
+//	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
+//	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
+//	conn, err := common.GetDBConnection(dsn)
+//	if err != nil {
+//		log.Fatalf("failed to connect to database: %v", err)
+//	}
+//	go func() {
+//		repo := repo.NewVideoRepo(conn)
+//		s := NewVideoService(repo, logger, settings)
+//		s.log.Println("Video service started on port " + settings.Server.Port)
+//		lis, err := net.Listen("tcp", "localhost:"+settings.Server.Port)
+//		if err != nil {
+//			log.Fatalf("failed to listen: %v", err)
+//		}
+//		srv := grpc.NewServer()
+//		pb.RegisterVideoServiceServer(srv, s)
+//		if err := srv.Serve(lis); err != nil {
+//			log.Fatalf("failed to serve: %v", err)
+//		}
+//	}()
+//
+//	c := make(chan os.Signal, 1)
+//	signal.Notify(c, os.Interrupt)
+//
+//	// Block until a signal is received.
+//	<-c
+//	logger.Println("Shutting down video service...")
+//	os.Exit(0)
+//
+//}
+
 func RunServer() {
-	logger := log.New(os.Stdout, "video-service ", log.LstdFlags)
+
+	logger := log.New(os.Stdout, "video-service: ", log.LstdFlags)
 	settings := config.GetSettings()
-	logger.Println("Initializing user service with settings...")
+	logger.Println("Initializing video service with settings...")
 	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
 	conn, err := common.GetDBConnection(dsn)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatalf("failed to connect to db: %v", err)
 	}
-	go func() {
-		repo := repo.NewVideoRepo(conn)
-		s := NewVideoService(repo, logger, settings)
-		s.log.Println("Video service started on port " + settings.Server.Port)
-		lis, err := net.Listen("tcp", "localhost:"+settings.Server.Port)
-		if err != nil {
-			log.Fatalf("failed to listen: %v", err)
-		}
-		srv := grpc.NewServer()
-		pb.RegisterVideoServiceServer(srv, s)
-		if err := srv.Serve(lis); err != nil {
-			log.Fatalf("failed to serve: %v", err)
-		}
-	}()
+
+	logger.Println("Migration database...")
+	err = migrateDB(conn)
+	if err != nil {
+		log.Fatalf("failed to migrate db: %v", err)
+	}
+
+	db := repo.NewVideoRepo(conn)
+
+	// Starting HTTP server for gRPC gateway
+	go runHTTPServer(settings, db, logger)
+	// Starting gRPC server
+	runGRPCServer(settings, db, logger)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
-
-	// Block until a signal is received.
 	<-c
-	logger.Println("Shutting down video service...")
+
+	logger.Println("Stopping the server")
+
 	os.Exit(0)
 
+}
+
+func migrateDB(db *gorm.DB) error {
+	return db.AutoMigrate(
+		&model.Video{},
+	)
+}
+
+func runGRPCServer(settings *config.Settings, db *repo.VideoRepo, logger *log.Logger) {
+	videoServer := NewVideoService(db, logger, settings)
+	var opts []grpc.ServerOption
+	s := grpc.NewServer(opts...)
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.GrpcHost, settings.Server.GrcpPort))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	pb.RegisterVideoServiceServer(s, videoServer)
+	logger.Println("GRPC Server started on port: " + settings.Server.GrcpPort)
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve grpc server: %v", err)
+	}
+}
+
+func runHTTPServer(settings *config.Settings, db *repo.VideoRepo, logger *log.Logger) {
+	videoServer := NewVideoService(db, logger, settings)
+	grpcMux := runtime.NewServeMux()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	err := pb.RegisterVideoServiceHandlerServer(ctx, grpcMux, videoServer)
+	if err != nil {
+		log.Fatalf("failed to register the handler to the server: %v", err)
+	}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+	mux.Handle("/", grpcMux)
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.HTTPHost, settings.Server.HTTPPort))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	logger.Println("HTTP Server started on port: " + settings.Server.HTTPPort)
+	if err := http.Serve(lis, mux); err != nil {
+		log.Fatalf("failed to serv http server: %v", err)
+	}
 }

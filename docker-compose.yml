@@ -5,7 +5,7 @@ services:
   database-service:
     image: postgres:latest
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -20,8 +20,8 @@ services:
       context: user/
       dockerfile: Dockerfile
     ports:
-      - 50051:50051
-      - 8080:8080
+      - "50051:50051"
+      - "8080:8080"
     depends_on:
       - database-service
     environment:
@@ -46,7 +46,7 @@ services:
       context: video/
       dockerfile: Dockerfile
     ports:
-      - 50052:50052
+      - "50052:50052"
     depends_on:
       - database-service
     environment:
@@ -56,8 +56,10 @@ services:
       - DB_PASSWORD=postgres
       - DB_NAME=postgres
       - DB_SSLMODE=disable
-      - SERVER_HOST=video-service
-      - SERVER_PORT=50052
+      - GRPC_HOST=video-service
+      - GRPC_PORT=50052
+      - HTTP_HOST=video-service
+      - HTTP_PORT=8081
       - LOG_LEVEL=debug
     networks:
       - backend-network

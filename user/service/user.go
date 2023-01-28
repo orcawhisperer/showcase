@@ -214,7 +214,7 @@ func migrateDB(db *gorm.DB) error {
 
 func runGRPCServer(settings *config.Settings, db *repo.UserRepo, logger *log.Logger) {
 	userServer := NewUserServer(db, logger, settings)
-	opts := []grpc.ServerOption{}
+	var opts []grpc.ServerOption
 	s := grpc.NewServer(opts...)
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.GrpcHost, settings.Server.GrcpPort))
 	if err != nil {
@@ -237,6 +237,10 @@ func runHTTPServer(settings *config.Settings, db *repo.UserRepo, logger *log.Log
 		log.Fatalf("failed to register the handler to the server: %v", err)
 	}
 	mux := http.NewServeMux()
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
 	mux.Handle("/", grpcMux)
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.HTTPHost, settings.Server.HTTPPort))
 	if err != nil {

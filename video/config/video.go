@@ -1,10 +1,14 @@
 package config
 
-import "os"
+import (
+	"os"
+)
 
 type server struct {
-	Host string
-	Port string
+	GrpcHost string
+	GrcpPort string
+	HTTPHost string
+	HTTPPort string
 }
 
 type database struct {
@@ -25,14 +29,18 @@ type Settings struct {
 	Server   *server
 	Database *database
 	Logger   *logger
+	JWT      *jwt
 }
 
 // GetSettings returns the settings
 func GetSettings() *Settings {
+
 	Settings := &Settings{
 		Server: &server{
-			Host: os.Getenv("SERVER_HOST"),
-			Port: os.Getenv("SERVER_PORT"),
+			GrpcHost: os.Getenv("GRPC_HOST"),
+			GrcpPort: os.Getenv("GRPC_PORT"),
+			HTTPHost: os.Getenv("HTTP_HOST"),
+			HTTPPort: os.Getenv("HTTP_PORT"),
 		},
 
 		Database: &database{
