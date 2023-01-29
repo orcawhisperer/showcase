@@ -36,23 +36,23 @@ func GetSettings() *Settings {
 
 	Settings := &Settings{
 		Server: &server{
-			GrpcHost: os.Getenv("GRPC_HOST"),
-			GrcpPort: os.Getenv("GRPC_PORT"),
-			HTTPHost: os.Getenv("HTTP_HOST"),
-			HTTPPort: os.Getenv("HTTP_PORT"),
+			GrpcHost: os.Getenv("VIDEO_SVC_GRPC_HOST"),
+			GrcpPort: os.Getenv("VIDEO_SVC_GRPC_PORT"),
+			HTTPHost: os.Getenv("VIDEO_SVC_HTTP_HOST"),
+			HTTPPort: os.Getenv("VIDEO_SVC_HTTP_PORT"),
 		},
 
 		Database: &database{
-			Host:     os.Getenv("DB_HOST"),
-			Port:     os.Getenv("DB_PORT"),
-			User:     os.Getenv("DB_USER"),
-			Password: os.Getenv("DB_PASSWORD"),
-			Name:     os.Getenv("DB_NAME"),
-			SslMode:  os.Getenv("DB_SSLMODE"),
+			Host:     os.Getenv("VIDEO_SVC_DB_HOST"),
+			Port:     os.Getenv("VIDEO_SVC_DB_PORT"),
+			User:     os.Getenv("VIDEO_SVC_DB_USER"),
+			Password: os.Getenv("VIDEO_SVC_DB_PASSWORD"),
+			Name:     os.Getenv("VIDEO_SVC_DB_NAME"),
+			SslMode:  os.Getenv("VIDEO_SVC_DB_SSLMODE"),
 		},
 
 		Logger: &logger{
-			Level: os.Getenv("LOG_LEVEL"),
+			Level: os.Getenv("VIDEO_SVC_LOG_LEVEL"),
 		},
 	}
 	return Settings

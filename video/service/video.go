@@ -222,16 +222,12 @@ func runGRPCServer(settings *config.Settings, db *repo.VideoRepo, logger *log.Lo
 func initDB(settings *config.Settings) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s port=%s video=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
 	conn, err := common.GetDBConnection(dsn)
-	if err != nil {
-		log.Fatalf("failed to connect to db: %v", err)
-	}
-	return conn, nil
+	return conn, err
 }
 
 func GetHTTPHandler() http.Handler {
 	logger := log.New(os.Stdout, "video-api-service: ", log.LstdFlags)
 	settings := config.GetSettings()
-	logger.Println("Settings: ", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
 	logger.Println("Initializing video http service with settings...")
 	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
 	conn, err := initDB(settings)

@@ -24,19 +24,19 @@ services:
     depends_on:
       - database-service
     environment:
-      - DB_HOST=database-service
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=postgres
-      - DB_SSLMODE=disable
-      - JWT_SECRET=Thisisajwtsecret
-      - JWT_EXPIRY=48
-      - GRPC_HOST=user-service
-      - GRPC_PORT=50051
-      - HTTP_HOST=user-service
-      - HTTP_PORT=8080
-      - LOG_LEVEL=debug
+      - USER_SVC_DB_HOST=database-service
+      - USER_SVC_DB_PORT=5432
+      - USER_SVC_DB_USER=postgres
+      - USER_SVC_DB_PASSWORD=postgres
+      - USER_SVC_DB_NAME=userdb
+      - USER_SVC_DB_SSLMODE=disable
+      - USER_SVC_JWT_SECRET=Thisisajwtsecret
+      - USER_SVC_JWT_EXPIRY=48
+      - USER_SVC_GRPC_HOST=user-service
+      - USER_SVC_GRPC_PORT=50051
+      - USER_SVC_HTTP_HOST=user-service
+      - USER_SVC_HTTP_PORT=8080
+      - USER_SVC_LOG_LEVEL=debug
     networks:
       - backend-network
   video-service:
@@ -49,17 +49,17 @@ services:
     depends_on:
       - database-service
     environment:
-      - DB_HOST=database-service
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=postgres
-      - DB_SSLMODE=disable
-      - GRPC_HOST=video-service
-      - GRPC_PORT=50052
-      - HTTP_HOST=video-service
-      - HTTP_PORT=8090
-      - LOG_LEVEL=debug
+      - VIDEO_SVC_DB_HOST=database-service
+      - VIDEO_SVC_DB_PORT=5432
+      - VIDEO_SVC_DB_USER=postgres
+      - VIDEO_SVC_DB_PASSWORD=postgres
+      - VIDEO_SVC_DB_NAME=videodb
+      - VIDEO_SVC_DB_SSLMODE=disable
+      - VIDEO_SVC_GRPC_HOST=video-service
+      - VIDEO_SVC_GRPC_PORT=50052
+      - VIDEO_SVC_HTTP_HOST=video-service
+      - VIDEO_SVC_HTTP_PORT=8090
+      - VIDEO_SVC_LOG_LEVEL=debug
     networks:
       - backend-network
   api-gateway-service:
@@ -72,18 +72,8 @@ services:
     depends_on:
       - user-service
       - video-service
-    environment:
-      - DB_HOST=database-service
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=postgres
-      - DB_SSLMODE=disable
-      - USER_GRPC_HOST=user-service
-      - VIDEO_GRPC_HOST=video-service
-      - HTTP_HOST=api-gateway-service
-      - HTTP_PORT=8080
-      - LOG_LEVEL=debug
+    env_file:
+      - config.env
     networks:
       - backend-network
 networks:

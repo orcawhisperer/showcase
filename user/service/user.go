@@ -188,18 +188,8 @@ func RunServer() {
 
 	db := repo.NewUserRepo(conn)
 
-	// Starting HTTP server for gRPC gateway
-	// go runHTTPServer(settings, db, logger)
 	// Starting gRPC server
 	runGRPCServer(settings, db, logger)
-
-	// c := make(chan os.Signal, 1)
-	// signal.Notify(c, os.Interrupt)
-	// <-c
-
-	// logger.Println("Stopping the server")
-
-	// os.Exit(0)
 
 }
 
