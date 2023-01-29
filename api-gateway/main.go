@@ -27,7 +27,7 @@ func main() {
 
 	// create a new serve mux and register handlers
 	mux := http.NewServeMux()
-	mux.Handle("/api/v1/user", userHandler)
+	mux.Handle("/user", userHandler)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.HTTPHost, settings.Server.HTTPPort))
 	if err != nil {
