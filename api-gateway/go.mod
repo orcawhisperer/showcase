@@ -7,8 +7,11 @@ require github.com/iamvasanth07/showcase/user v0.0.0-20230129112359-e914a2b2a04b
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/gosimple/slug v1.13.1 // indirect
+	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.0 // indirect
-	github.com/iamvasanth07/showcase/common v0.0.0-20230129115403-76a84b8a9091 // indirect
+	github.com/iamvasanth07/showcase/common v0.0.0-20230129120223-c168c946c376 // indirect
+	github.com/iamvasanth07/showcase/video v0.0.0-20230129120223-c168c946c376 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.2.0 // indirect

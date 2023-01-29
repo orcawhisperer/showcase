@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.0
-	github.com/iamvasanth07/showcase/common v0.0.0-20230129115403-76a84b8a9091
+	github.com/iamvasanth07/showcase/common v0.0.0-20230129120223-c168c946c376
 	github.com/satori/go.uuid v1.2.0
 	golang.org/x/crypto v0.5.0
 	google.golang.org/grpc v1.52.3

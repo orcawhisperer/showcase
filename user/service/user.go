@@ -8,7 +8,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/signal"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -178,6 +177,9 @@ func RunServer() {
 	logger.Println("Initializing user service with settings...")
 	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
 	conn, err := initDB(settings)
+	if err != nil {
+		log.Fatalf("failed to connect to db: %v", err)
+	}
 	logger.Println("Migration database...")
 	err = migrateDB(conn)
 	if err != nil {
@@ -191,23 +193,20 @@ func RunServer() {
 	// Starting gRPC server
 	runGRPCServer(settings, db, logger)
 
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	<-c
+	// c := make(chan os.Signal, 1)
+	// signal.Notify(c, os.Interrupt)
+	// <-c
 
-	logger.Println("Stopping the server")
+	// logger.Println("Stopping the server")
 
-	os.Exit(0)
+	// os.Exit(0)
 
 }
 
 func initDB(settings *config.Settings) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
 	conn, err := common.GetDBConnection(dsn)
-	if err != nil {
-		log.Fatalf("failed to connect to db: %v", err)
-	}
-	return conn, nil
+	return conn, err
 }
 
 func migrateDB(db *gorm.DB) error {
