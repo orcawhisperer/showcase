@@ -13,35 +13,35 @@ import "google/api/annotations.proto";
 service UserService {
   rpc Get (GetUserRequest) returns (GetUserResponse) {
     option (google.api.http) = {
-      get: "/v1/user/{id}"
+      get: "/{id}"
     };
   }
   rpc GetAll (GetAllUserRequest) returns (GetAllUserResponse) {
     option (google.api.http) = {
-      get: "/v1/user"
+      get: "/"
     };
   }
   rpc Create (CreateUserRequest) returns (CreateUserResponse) {
     option (google.api.http) = {
-      post: "/v1/user"
+      post: "/"
       body: "*"
     };
   }
   rpc Update (UpdateUserRequest) returns (UpdateUserResponse) {
     option (google.api.http) = {
-      put: "/v1/user/{id}"
+      put: "/{id}"
       body: "*"
     };
   }
   rpc Delete (DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
-      delete: "/v1/user/{id}"
+      delete: "/{id}"
     };
   }
 
   rpc Login (LoginRequest) returns (LoginResponse) {
     option (google.api.http) = {
-      post: "/v1/user/login"
+      post: "/login"
       body: "*"
     };
   }

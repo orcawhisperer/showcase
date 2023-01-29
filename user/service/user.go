@@ -259,6 +259,7 @@ func runGRPCServer(settings *config.Settings, db *repo.UserRepo, logger *log.Log
 func GetHTTPHandler() http.Handler {
 	logger := log.New(os.Stdout, "user-api-service: ", log.LstdFlags)
 	settings := config.GetSettings()
+	logger.Println("Settings: ", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
 	logger.Println("Initializing user http service with settings...")
 	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
 	conn, err := initDB(settings)
