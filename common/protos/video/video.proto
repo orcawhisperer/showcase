@@ -6,38 +6,15 @@ package video;
 
 option go_package = "github.com/iamvasanth07/showcase/common/protos/video";
 
-import "google/api/annotations.proto";
 
 // VideoService is the service for video management
 
 service VideoService {
-    rpc CreateVideo (CreateVideoRequest) returns (CreateVideoResponse) {
-        option (google.api.http) = {
-            post: "/api/v1/videos"
-            body: "*"
-        };
-    }
-    rpc GetVideo (GetVideoRequest) returns (GetVideoResponse) {
-        option (google.api.http) = {
-            get: "/api/v1/videos/{slug}"
-        };
-    }
-    rpc ListVideos (ListVideosRequest) returns (ListVideosResponse) {
-        option (google.api.http) = {
-            get: "/api/v1/videos"
-        };
-    }
-    rpc DeleteVideo (DeleteVideoRequest) returns (DeleteVideoResponse) {
-        option (google.api.http) = {
-            delete: "/api/v1/videos/{slug}"
-        };
-    }
-    rpc UpdateVideo (UpdateVideoRequest) returns (UpdateVideoResponse) {
-        option (google.api.http) = {
-            put: "/api/v1/videos/{video.slug}"
-            body: "*"
-        };
-    }
+    rpc CreateVideo (CreateVideoRequest) returns (CreateVideoResponse) {}
+    rpc GetVideo (GetVideoRequest) returns (GetVideoResponse) {}
+    rpc ListVideos (ListVideosRequest) returns (ListVideosResponse) {}
+    rpc DeleteVideo (DeleteVideoRequest) returns (DeleteVideoResponse) {}
+    rpc UpdateVideo (UpdateVideoRequest) returns (UpdateVideoResponse) {}
 }
 
 // CreateVideoRequest is the request for the CreateVideo method

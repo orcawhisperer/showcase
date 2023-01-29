@@ -3,8 +3,8 @@ module github.com/iamvasanth07/showcase/api-gateway
 go 1.19
 
 require (
-	github.com/iamvasanth07/showcase/user v0.0.0-20230129120223-c168c946c376
-	github.com/iamvasanth07/showcase/video v0.0.0-20230129121449-4145abb7f0ff
+	github.com/iamvasanth07/showcase/user v0.0.0-20230129130929-3513212bd7cb
+	github.com/iamvasanth07/showcase/video v0.0.0-20230129130929-3513212bd7cb
 )
 
 require (

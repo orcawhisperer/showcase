@@ -30,10 +30,14 @@ github.com/iamvasanth07/showcase/user v0.0.0-20230129112359-e914a2b2a04b h1:BvQT
 github.com/iamvasanth07/showcase/user v0.0.0-20230129112359-e914a2b2a04b/go.mod h1:rWVzkDG1Sv8ZpgvxyuIbaRnTA3tx7znRy9/H1278cew=
 github.com/iamvasanth07/showcase/user v0.0.0-20230129120223-c168c946c376 h1:0ow+C+nsYe9q3YMWGdWPbTCo5y1GNvA6RHXtBae0eEk=
 github.com/iamvasanth07/showcase/user v0.0.0-20230129120223-c168c946c376/go.mod h1:FeQDTE0i9tw9VT1q8xIDCBWN2FbNIa+/SMWsWhHb6jo=
+github.com/iamvasanth07/showcase/user v0.0.0-20230129130929-3513212bd7cb h1:IZdwS0LCuHr7+gAJIqfJqvi0YH6nKusn9SF093c16Ao=
+github.com/iamvasanth07/showcase/user v0.0.0-20230129130929-3513212bd7cb/go.mod h1:+1dZQ54p5QzfglK9mk4P5aJb35VFgsCNdmh4rCYSniA=
 github.com/iamvasanth07/showcase/video v0.0.0-20230129120223-c168c946c376 h1:Vly5hhrKchrXjcEpCmZzVjYYPWFuvUykr/LMOeYLBKs=
 github.com/iamvasanth07/showcase/video v0.0.0-20230129120223-c168c946c376/go.mod h1:3w5LLRr8iabsJH7Btk02GxJYJl3ZKU7X9a65bNGY43I=
 github.com/iamvasanth07/showcase/video v0.0.0-20230129121449-4145abb7f0ff h1:sGXY30pLAGWDeejm2UT+9DE7x5CClWRwYxCvfcD4gEU=
 github.com/iamvasanth07/showcase/video v0.0.0-20230129121449-4145abb7f0ff/go.mod h1:3w5LLRr8iabsJH7Btk02GxJYJl3ZKU7X9a65bNGY43I=
+github.com/iamvasanth07/showcase/video v0.0.0-20230129130929-3513212bd7cb h1:CC8H+B4xEUvAaAb5sfQr2phGnCmg+kfgYwd6oBsww6Q=
+github.com/iamvasanth07/showcase/video v0.0.0-20230129130929-3513212bd7cb/go.mod h1:3w5LLRr8iabsJH7Btk02GxJYJl3ZKU7X9a65bNGY43I=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b/go.mod h1:vsD4gTJCa9TptPL8sPkXrLZ+hDuNrZCnj29CQpr4X1E=

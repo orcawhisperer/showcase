@@ -7,10 +7,8 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"os"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/iamvasanth07/showcase/common"
 	pb "github.com/iamvasanth07/showcase/common/protos/video"
 	"github.com/iamvasanth07/showcase/video/config"
@@ -155,21 +153,8 @@ func RunServer() {
 	if err != nil {
 		log.Fatalf("failed to migrate db: %v", err)
 	}
-
 	db := repo.NewVideoRepo(conn)
-
-	// Starting HTTP server for gRPC gateway
-	// go runHTTPServer(settings, db, logger)
-	// Starting gRPC server
 	runGRPCServer(settings, db, logger)
-
-	// c := make(chan os.Signal, 1)
-	// signal.Notify(c, os.Interrupt)
-	// <-c
-
-	// logger.Println("Stopping the server")
-
-	// os.Exit(0)
 
 }
 
@@ -194,53 +179,8 @@ func runGRPCServer(settings *config.Settings, db *repo.VideoRepo, logger *log.Lo
 	}
 }
 
-// func runHTTPServer(settings *config.Settings, db *repo.VideoRepo, logger *log.Logger) {
-// 	videoServer := NewVideoService(db, logger, settings)
-// 	grpcMux := runtime.NewServeMux()
-// 	ctx, cancel := context.WithCancel(context.Background())
-// 	defer cancel()
-// 	err := pb.RegisterVideoServiceHandlerServer(ctx, grpcMux, videoServer)
-// 	if err != nil {
-// 		log.Fatalf("failed to register the handler to the server: %v", err)
-// 	}
-// 	mux := http.NewServeMux()
-// 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-// 		w.WriteHeader(http.StatusOK)
-// 		w.Write([]byte("OK"))
-// 	})
-// 	mux.Handle("/", grpcMux)
-// 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.HTTPHost, settings.Server.HTTPPort))
-// 	if err != nil {
-// 		log.Fatalf("failed to listen: %v", err)
-// 	}
-// 	logger.Println("HTTP Server started on port: " + settings.Server.HTTPPort)
-// 	if err := http.Serve(lis, mux); err != nil {
-// 		log.Fatalf("failed to serv http server: %v", err)
-// 	}
-// }
-
 func initDB(settings *config.Settings) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=%s port=%s video=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
 	conn, err := common.GetDBConnection(dsn)
 	return conn, err
-}
-
-func GetHTTPHandler() http.Handler {
-	logger := log.New(os.Stdout, "video-api-service: ", log.LstdFlags)
-	settings := config.GetSettings()
-	logger.Println("Initializing video http service with settings...")
-	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
-	conn, err := initDB(settings)
-	db := repo.NewVideoRepo(conn)
-	videoServer := NewVideoService(db, logger, settings)
-	grpcMux := runtime.NewServeMux()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	err = pb.RegisterVideoServiceHandlerServer(ctx, grpcMux, videoServer)
-	if err != nil {
-		log.Fatalf("failed to register the handler to the server: %v", err)
-	}
-	mux := http.NewServeMux()
-	mux.Handle("/", grpcMux)
-	return mux
 }

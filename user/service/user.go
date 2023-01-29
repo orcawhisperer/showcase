@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/iamvasanth07/showcase/common"
 	pb "github.com/iamvasanth07/showcase/common/protos/user"
 	"github.com/iamvasanth07/showcase/user/config"
@@ -218,50 +216,4 @@ func runGRPCServer(settings *config.Settings, db *repo.UserRepo, logger *log.Log
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve grpc server: %v", err)
 	}
-}
-
-// func runHTTPServer(settings *config.Settings, db *repo.UserRepo, logger *log.Logger) {
-// 	userServer := NewUserServer(db, logger, settings)
-// 	grpcMux := runtime.NewServeMux()
-// 	ctx, cancel := context.WithCancel(context.Background())
-// 	defer cancel()
-// 	err := pb.RegisterUserServiceHandlerServer(ctx, grpcMux, userServer)
-// 	if err != nil {
-// 		log.Fatalf("failed to register the handler to the server: %v", err)
-// 	}
-// 	mux := http.NewServeMux()
-// 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-// 		w.WriteHeader(http.StatusOK)
-// 		w.Write([]byte("OK"))
-// 	})
-// 	mux.Handle("/", grpcMux)
-// 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.HTTPHost, settings.Server.HTTPPort))
-// 	if err != nil {
-// 		log.Fatalf("failed to listen: %v", err)
-// 	}
-// 	logger.Println("HTTP Server started on port: " + settings.Server.HTTPPort)
-// 	if err := http.Serve(lis, mux); err != nil {
-// 		log.Fatalf("failed to serv http server: %v", err)
-// 	}
-// }
-
-func GetHTTPHandler() http.Handler {
-	logger := log.New(os.Stdout, "user-api-service: ", log.LstdFlags)
-	settings := config.GetSettings()
-	logger.Println("Settings: ", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
-	logger.Println("Initializing user http service with settings...")
-	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
-	conn, err := initDB(settings)
-	db := repo.NewUserRepo(conn)
-	userServer := NewUserServer(db, logger, settings)
-	grpcMux := runtime.NewServeMux()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	err = pb.RegisterUserServiceHandlerServer(ctx, grpcMux, userServer)
-	if err != nil {
-		log.Fatalf("failed to register the handler to the server: %v", err)
-	}
-	mux := http.NewServeMux()
-	mux.Handle("/", grpcMux)
-	return mux
 }
