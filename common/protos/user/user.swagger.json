@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/": {
+    "/v1/user": {
       "get": {
         "operationId": "UserService_GetAll",
         "responses": {
@@ -84,7 +84,7 @@
         ]
       }
     },
-    "/login": {
+    "/v1/user/login": {
       "post": {
         "operationId": "UserService_Login",
         "responses": {
@@ -116,7 +116,7 @@
         ]
       }
     },
-    "/{id}": {
+    "/v1/user/{id}": {
       "get": {
         "operationId": "UserService_Get",
         "responses": {
