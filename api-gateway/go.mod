@@ -4,9 +4,9 @@ go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.8.2
-	github.com/iamvasanth07/showcase/common v0.0.0-20230129121449-4145abb7f0ff
-	github.com/iamvasanth07/showcase/user v0.0.0-20230129142924-096fd23f7649
-	github.com/iamvasanth07/showcase/video v0.0.0-20230129130929-3513212bd7cb
+	github.com/iamvasanth07/showcase/common v0.0.0-20230129151937-bc074d03dca3
+	github.com/iamvasanth07/showcase/user v0.0.0-20230129190732-6ae240282872
+	github.com/iamvasanth07/showcase/video v0.0.0-20230129190732-6ae240282872
 	google.golang.org/grpc v1.52.3
 )
 

@@ -16,7 +16,6 @@ service UserService {
   rpc Update (UpdateUserRequest) returns (UpdateUserResponse) {}
   rpc Delete (DeleteUserRequest) returns (DeleteUserResponse) {}
   rpc Login (LoginRequest) returns (LoginResponse) {}
-
 }
 
 // The request message containing the user's id.
