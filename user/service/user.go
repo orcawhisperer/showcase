@@ -177,12 +177,7 @@ func RunServer() {
 	settings := config.GetSettings()
 	logger.Println("Initializing user service with settings...")
 	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
-	conn, err := common.GetDBConnection(dsn)
-	if err != nil {
-		log.Fatalf("failed to connect to db: %v", err)
-	}
-
+	conn, err := initDB(settings)
 	logger.Println("Migration database...")
 	err = migrateDB(conn)
 	if err != nil {
@@ -192,7 +187,7 @@ func RunServer() {
 	db := repo.NewUserRepo(conn)
 
 	// Starting HTTP server for gRPC gateway
-	go runHTTPServer(settings, db, logger)
+	// go runHTTPServer(settings, db, logger)
 	// Starting gRPC server
 	runGRPCServer(settings, db, logger)
 
@@ -204,6 +199,15 @@ func RunServer() {
 
 	os.Exit(0)
 
+}
+
+func initDB(settings *config.Settings) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.Name, settings.Database.SslMode)
+	conn, err := common.GetDBConnection(dsn)
+	if err != nil {
+		log.Fatalf("failed to connect to db: %v", err)
+	}
+	return conn, nil
 }
 
 func migrateDB(db *gorm.DB) error {
@@ -227,27 +231,47 @@ func runGRPCServer(settings *config.Settings, db *repo.UserRepo, logger *log.Log
 	}
 }
 
-func runHTTPServer(settings *config.Settings, db *repo.UserRepo, logger *log.Logger) {
+// func runHTTPServer(settings *config.Settings, db *repo.UserRepo, logger *log.Logger) {
+// 	userServer := NewUserServer(db, logger, settings)
+// 	grpcMux := runtime.NewServeMux()
+// 	ctx, cancel := context.WithCancel(context.Background())
+// 	defer cancel()
+// 	err := pb.RegisterUserServiceHandlerServer(ctx, grpcMux, userServer)
+// 	if err != nil {
+// 		log.Fatalf("failed to register the handler to the server: %v", err)
+// 	}
+// 	mux := http.NewServeMux()
+// 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+// 		w.WriteHeader(http.StatusOK)
+// 		w.Write([]byte("OK"))
+// 	})
+// 	mux.Handle("/", grpcMux)
+// 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.HTTPHost, settings.Server.HTTPPort))
+// 	if err != nil {
+// 		log.Fatalf("failed to listen: %v", err)
+// 	}
+// 	logger.Println("HTTP Server started on port: " + settings.Server.HTTPPort)
+// 	if err := http.Serve(lis, mux); err != nil {
+// 		log.Fatalf("failed to serv http server: %v", err)
+// 	}
+// }
+
+func GetHTTPHandler() http.Handler {
+	logger := log.New(os.Stdout, "user-api-service: ", log.LstdFlags)
+	settings := config.GetSettings()
+	logger.Println("Initializing user http service with settings...")
+	logger.Printf("%v, %v, %v", settings.Database, settings.Server, settings.Logger)
+	conn, err := initDB(settings)
+	db := repo.NewUserRepo(conn)
 	userServer := NewUserServer(db, logger, settings)
 	grpcMux := runtime.NewServeMux()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	err := pb.RegisterUserServiceHandlerServer(ctx, grpcMux, userServer)
+	err = pb.RegisterUserServiceHandlerServer(ctx, grpcMux, userServer)
 	if err != nil {
 		log.Fatalf("failed to register the handler to the server: %v", err)
 	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
-	})
 	mux.Handle("/", grpcMux)
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", settings.Server.HTTPHost, settings.Server.HTTPPort))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	logger.Println("HTTP Server started on port: " + settings.Server.HTTPPort)
-	if err := http.Serve(lis, mux); err != nil {
-		log.Fatalf("failed to serv http server: %v", err)
-	}
+	return mux
 }
