@@ -4,6 +4,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -82,7 +83,7 @@ func (s *VideoServer) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*p
 
 func (s *VideoServer) ListVideos(ctx context.Context, req *pb.ListVideosRequest) (*pb.ListVideosResponse, error) {
 	s.log.Println("List videos request received")
-	videos, err := s.db.ListVideos(int(req.Page), int(req.Limit))
+	videos, err := s.db.ListVideos(int(req.Limit), int(req.Page))
 	if err != nil {
 		return nil, err
 	}
@@ -103,13 +104,24 @@ func (s *VideoServer) ListVideos(ctx context.Context, req *pb.ListVideosRequest)
 
 func (s *VideoServer) UpdateVideo(ctx context.Context, req *pb.UpdateVideoRequest) (*pb.UpdateVideoResponse, error) {
 	s.log.Println("Update video request received")
-	video := model.Video{
+
+	// Check if video exists
+	video, err := s.db.GetVideoBySlug(req.Video.Slug)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New(fmt.Sprintf("Video with id %s not found", req.Video.Id))
+		}
+		return nil, err
+	}
+
+	video = &model.Video{
 		Uuid:        req.Video.Id,
 		Title:       req.Video.Title,
 		Description: req.Video.Description,
 		Url:         req.Video.Url,
 	}
-	err := s.db.UpdateVideo(&video)
+
+	err = s.db.UpdateVideo(video)
 	if err != nil {
 		return nil, err
 	}

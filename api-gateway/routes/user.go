@@ -56,11 +56,13 @@ func NewUserRoutes(config *config.Settings) *UserRoutes {
 // RegisterRoutes registers the user routes
 func (r *UserRoutes) RegisterUserSvcRoutes(router *gin.Engine) {
 
-	router.GET("/user/:id", r.getUser)
-	router.POST("/user", r.createUser)
-	router.PUT("/user/:id", r.updateUser)
-	router.DELETE("/user/:id", r.deleteUser)
-	router.POST("/user/login", r.login)
+	routes := router.Group("/api/v1")
+
+	routes.GET("/user/:id", r.getUser)
+	routes.POST("/user", r.createUser)
+	routes.PUT("/user/:id", r.updateUser)
+	routes.DELETE("/user/:id", r.deleteUser)
+	routes.POST("/user/login", r.login)
 }
 
 // getUser call the user grpc service and returns a user
@@ -73,7 +75,9 @@ func (r *UserRoutes) getUser(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, gin.H{user})
+	c.JSON(200, gin.H{
+		"user": user,
+	})
 }
 
 // createUser creates a user
@@ -99,10 +103,13 @@ func (r *UserRoutes) createUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": "Internal Server Error",
+			"error":   err.Error(),
 		})
 		return
 	}
-	c.JSON(200, gin.H{res})
+	c.JSON(200, gin.H{
+		"user": res.User,
+	})
 }
 
 // updateUser updates a user
@@ -131,7 +138,9 @@ func (r *UserRoutes) updateUser(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, gin.H{res})
+	c.JSON(200, gin.H{
+		"user": res.User,
+	})
 }
 
 // deleteUser deletes a user
@@ -144,7 +153,9 @@ func (r *UserRoutes) deleteUser(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, gin.H{res})
+	c.JSON(200, gin.H{
+		"message": fmt.Sprintf("User %s deleted successfully", res.Id),
+	})
 }
 
 // login logs a user in
@@ -167,5 +178,7 @@ func (r *UserRoutes) login(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, gin.H{res})
+	c.JSON(200, gin.H{
+		"token": res.Token,
+	})
 }
